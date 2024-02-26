@@ -1,0 +1,51 @@
+package com.warehouse.myshop.product.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.UUID;
+
+@Entity
+@Getter
+@Setter
+public class Product {
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type = "uuid-char")
+    private UUID uuid;
+    @Column(nullable = false)
+    private String name;
+    @Column(nullable = false, name = "article_number", unique = true)
+    private String articleNumber;
+    private String description;
+    @Column(nullable = false, name = "category_id")
+    private Long categoryId;
+    @Column(nullable = false)
+    private Double price;
+    @Column(nullable = false)
+    private Integer quantity;
+    @Column(name = "last_update")
+    private LocalDateTime lastUpdate;
+    @Column(nullable = false, name = "creation_date")
+    private LocalDateTime creationDate = LocalDateTime.now();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Product product = (Product) o;
+        return uuid != null && Objects.equals(uuid, product.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}

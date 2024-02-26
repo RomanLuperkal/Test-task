@@ -4,15 +4,15 @@ CREATE TABLE IF NOT EXISTS categories (
     CONSTRAINT uq_category_name UNIQUE (name)
     );
 
-CREATE TABLE IF NOT EXISTS warehouse (
+CREATE TABLE IF NOT EXISTS product (
     id             UUID PRIMARY KEY,
-    name           VARCHAR,
-    article_number BIGINT,
+    name           VARCHAR NOT NULL,
+    article_number VARCHAR NOT NULL,
     description    VARCHAR,
     category_id    BIGINT REFERENCES categories (category_id) ON DELETE RESTRICT,
-    price          INTEGER,
-    quantity       INTEGER,
+    price          NUMERIC(6,2) NOT NULL,
+    quantity       INTEGER NOT NULL,
     last_update    TIMESTAMP(0),
-    create_time    TIMESTAMP(0),
+    creation_date    TIMESTAMP(0) NOT NULL,
     CONSTRAINT uq_article_number UNIQUE (article_number)
 );
