@@ -53,4 +53,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .categories(mapper.mapToListCategoryDto(categoryRepository.findAll(pageable)))
                 .build();
     }
+
+    @Override
+    public Boolean existsCategory(Long id) {
+        return categoryRepository.existsById(id);
+    }
 }

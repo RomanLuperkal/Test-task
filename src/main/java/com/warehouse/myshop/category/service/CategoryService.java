@@ -16,4 +16,6 @@ public interface CategoryService {
     CategoryDtoResp getCategoryById(Long id);
 
     ListCategoryDto getCategories(Pageable pageable);
+
+    Boolean existsCategory(Long id);
 }

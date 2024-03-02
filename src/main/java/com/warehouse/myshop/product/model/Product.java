@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.model;
 
+import com.warehouse.myshop.category.model.Category;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
@@ -25,8 +26,10 @@ public class Product {
     @Column(nullable = false, name = "article_number", unique = true)
     private String articleNumber;
     private String description;
-    @Column(nullable = false, name = "category_id")
-    private Long categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    //@Column(nullable = false, name = "category_id")
+    private Category category;
     @Column(nullable = false)
     private Double price;
     @Column(nullable = false)
