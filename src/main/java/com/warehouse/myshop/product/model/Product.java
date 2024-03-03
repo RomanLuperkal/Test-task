@@ -1,6 +1,7 @@
 package com.warehouse.myshop.product.model;
 
 import com.warehouse.myshop.category.model.Category;
+import com.warehouse.myshop.product.audit.ProductAudit;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
@@ -8,7 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,16 +28,13 @@ public class Product {
     private String description;
     @ManyToOne
     @JoinColumn(name = "category_id")
-    //@Column(nullable = false, name = "category_id")
     private Category category;
     @Column(nullable = false)
     private Double price;
     @Column(nullable = false)
     private Integer quantity;
-    @Column(name = "last_update")
-    private LocalDateTime lastUpdate;
-    @Column(nullable = false, name = "creation_date")
-    private LocalDateTime creationDate = LocalDateTime.now();
+    @Embedded
+    private ProductAudit productAudit;
 
     @Override
     public boolean equals(Object o) {
