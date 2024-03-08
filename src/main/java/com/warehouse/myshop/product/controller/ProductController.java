@@ -21,7 +21,6 @@ import java.util.UUID;
 @RequestMapping("/products")
 @Slf4j
 @Validated
-
 public class ProductController {
     @Qualifier("ProductServiceDecorator")
     private final ProductService productService;
