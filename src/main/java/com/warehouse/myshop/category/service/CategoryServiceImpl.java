@@ -28,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDtoResp updateCategory(UpdateCategoryDto updateCategory, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Category with id=" + id + " was not found"));
+                () -> new NotFoundException("Категории с id=" + id + " не найдено"));
         category.setName(updateCategory.getName());
         return mapper.mapToCategoryDtoResp(category);
     }
@@ -36,14 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id))
-            throw new NotFoundException("Category with id=" + id + " was not found");
+            throw new NotFoundException("Категории с id=" + id + " не найдено");
         categoryRepository.deleteById(id);
     }
 
     @Override
     public CategoryDtoResp getCategoryById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Category with id=" + id + " was not found"));
+                () -> new NotFoundException("Категории с id=" + id + " не найдено"));
         return mapper.mapToCategoryDtoResp(category);
     }
 

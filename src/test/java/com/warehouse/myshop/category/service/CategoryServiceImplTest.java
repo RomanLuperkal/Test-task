@@ -85,7 +85,7 @@ class CategoryServiceImplTest {
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> categoryService.updateCategory(updateCategoryDto, 1L));
-        assertThat(e.getMessage()).contains("Категории с id=1 не найдено");
+        assertThat(e.getMessage()).contains("РљР°С‚РµРіРѕСЂРёРё СЃ id=1 РЅРµ РЅР°Р№РґРµРЅРѕ");
     }
 
     @Test
@@ -103,7 +103,7 @@ class CategoryServiceImplTest {
         when(categoryRepository.existsById(1L)).thenReturn(false);
 
         NotFoundException e = assertThrows(NotFoundException.class, () -> categoryService.deleteCategory(1L));
-        assertThat(e.getMessage()).contains("Категории с id=1 не найдено");
+        assertThat(e.getMessage()).contains("РљР°С‚РµРіРѕСЂРёРё СЃ id=1 РЅРµ РЅР°Р№РґРµРЅРѕ");
 
         verify(categoryRepository, times(0)).deleteById(1L);
     }
@@ -130,7 +130,7 @@ class CategoryServiceImplTest {
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class, () -> categoryService.getCategoryById(1L));
-        assertThat(e.getMessage()).contains("Категории с id=1 не найдено");
+        assertThat(e.getMessage()).contains("РљР°С‚РµРіРѕСЂРёРё СЃ id=1 РЅРµ РЅР°Р№РґРµРЅРѕ");
     }
 
     @Test
