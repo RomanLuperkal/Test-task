@@ -1,18 +1,23 @@
 package com.warehouse.myshop.category.service;
 
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
+import com.warehouse.myshop.category.dto.ListCategoryDto;
 import com.warehouse.myshop.category.dto.NewCategoryDto;
 import com.warehouse.myshop.category.dto.UpdateCategoryDto;
 import com.warehouse.myshop.category.mapper.CategoryMapperImpl;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -21,18 +26,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class CategoryServiceImplTest {
+    @Autowired
     private CategoryServiceImpl categoryService;
-    @Mock
+    @MockBean
     private CategoryRepository categoryRepository;
 
     private final CategoryMapperImpl mapper = new CategoryMapperImpl();
-
-    @BeforeEach
-    void setUp() {
-        categoryService = new CategoryServiceImpl(categoryRepository, mapper);
-    }
 
     private Category category;
 
@@ -56,7 +57,6 @@ class CategoryServiceImplTest {
         initCategory(category);
         Category updatedCategory = new Category();
         updatedCategory.setName("testUpdatedCategory");
-        //when(categoryRepository.save(any(Category.class))).thenReturn(updatedCategory);
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         UpdateCategoryDto updateCategoryDto = UpdateCategoryDto.builder()
                 .name(updatedCategory.getName())
@@ -85,6 +85,7 @@ class CategoryServiceImplTest {
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> categoryService.updateCategory(updateCategoryDto, 1L));
+
         assertThat(e.getMessage()).contains("Категории с id=1 не найдено");
     }
 
@@ -135,9 +136,20 @@ class CategoryServiceImplTest {
 
     @Test
     void getCategoriesTest() {
-        /*ListCategoryDto expectedCategories = ListCategoryDto.builder()
-                .categories(List.of(new CategoryDtoResp(1L, "testCategory")))
-                .build();*/
+        List<Category> categories = List.of(new Category(1L, "testCategory"),
+                new Category(2L, "testCategory"));
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Category> page = new PageImpl<>(categories,pageable,categories.size());
+        ListCategoryDto expectedCategories =
+                ListCategoryDto.builder()
+                .categories(mapper.mapToListCategoryDto(page))
+                .build();
+
+        when(categoryRepository.findAll(pageable)).thenReturn(page);
+
+        ListCategoryDto actualCategories = categoryService.getCategories(pageable);
+
+        assertEquals(expectedCategories.getCategories(), actualCategories.getCategories());
     }
 
     private void initCategory(Category category) {
