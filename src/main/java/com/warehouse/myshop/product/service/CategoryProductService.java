@@ -22,14 +22,14 @@ public class CategoryProductService implements ProductService {
     @Override
     public ResponseProductDto createProduct(NewProductDto productDto) {
         if (!categoryService.existsCategory(productDto.getCategoryId()))
-            throw new NotFoundException("Такой категории не существует");
+            throw new NotFoundException("Категории с id=" + productDto.getCategoryId() + " не найдено");
         return origin.createProduct(productDto);
     }
 
     @Override
     public ResponseProductDto updateProduct(UUID uuid, UpdateProductDto productDto) {
         if (!categoryService.existsCategory(productDto.getCategoryId()))
-            throw new NotFoundException("Такой категории не существует");
+            throw new NotFoundException("Категории с id=" + productDto.getCategoryId() + " не найдено");
         return origin.updateProduct(uuid, productDto);
     }
 
