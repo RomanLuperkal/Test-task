@@ -1,10 +1,7 @@
 package com.warehouse.myshop.product;
 
-import com.warehouse.myshop.category.dto.ListCategoryDto;
-import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.service.CategoryService;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
-import com.warehouse.myshop.product.audit.ProductAudit;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
@@ -13,7 +10,6 @@ import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.service.CategoryProductService;
 import com.warehouse.myshop.product.service.ProductService;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +19,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class CategoryProductServiceTest {
+public class CategoryProductServiceTest extends ProductTestBase {
     @Autowired
     private CategoryProductService categoryProductService;
     @MockBean
@@ -125,17 +120,7 @@ public class CategoryProductServiceTest {
 
     @Test
     void getProductsTest() {
-        ProductAudit productAudit = new ProductAudit();
-        productAudit.setCreationDate(LocalDateTime.now());
-        Product product = new Product();
-        product.setUuid(UUID.randomUUID());
-        product.setName("test");
-        product.setArticleNumber("te-st");
-        product.setDescription("test description");
-        product.setCategory(new Category(1L, "testCategory"));
-        product.setPrice(10.5);
-        product.setQuantity(5);
-        product.setProductAudit(productAudit);
+        Product product = createProduct(createNewProductDto(), UUID.randomUUID());
         List<Product> products = List.of(product);
         Pageable pageable = PageRequest.of(0, 1);
         Page<Product> page = new PageImpl<>(products,pageable,products.size());
@@ -147,54 +132,5 @@ public class CategoryProductServiceTest {
 
         assertEquals(expectedProducts, actualProducts);
         verify(productService, times(1)).getProducts(pageable);
-    }
-
-    private ResponseProductDto createExpectedResponseDto(NewProductDto product) {
-        return ResponseProductDto.builder()
-                .uuid(UUID.randomUUID())
-                .name(product.getName())
-                .categoryId(product.getCategoryId())
-                .articleNumber(product.getArticleNumber())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .creationDate(LocalDateTime.now())
-                .build();
-    }
-
-    private ResponseProductDto createExpectedResponseDto(UpdateProductDto product) {
-        return ResponseProductDto.builder()
-                .uuid(UUID.randomUUID())
-                .name(product.getName())
-                .categoryId(product.getCategoryId())
-                .articleNumber(product.getArticleNumber())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .creationDate(LocalDateTime.now().minusDays(1))
-                .lastUpdate(LocalDateTime.now())
-                .build();
-    }
-
-    private UpdateProductDto createUpdateProductDto() {
-        return UpdateProductDto.builder()
-                .categoryId(1L)
-                .name("test")
-                .articleNumber("te-st-article")
-                .description("test description")
-                .price(50.5)
-                .quantity(10)
-                .build();
-    }
-
-    private NewProductDto createNewProductDto() {
-        return NewProductDto.builder()
-                .categoryId(1L)
-                .name("test")
-                .articleNumber("te-st-article")
-                .description("test description")
-                .price(50.5)
-                .quantity(10)
-                .build();
     }
 }

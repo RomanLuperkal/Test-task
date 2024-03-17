@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(UUID uuid) {
         if (!productRepository.existsById(uuid))
-            throw new NotFoundException("Товара с uuid=" + uuid + " не существует");
+            throw new NotFoundException("Товара с UUID=" + uuid + " не существует");
         productRepository.deleteById(uuid);
     }
 
