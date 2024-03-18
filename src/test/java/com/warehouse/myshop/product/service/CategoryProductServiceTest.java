@@ -1,15 +1,14 @@
-package com.warehouse.myshop.product;
+package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.service.CategoryService;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
+import com.warehouse.myshop.product.ProductTestBase;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
-import com.warehouse.myshop.product.service.CategoryProductService;
-import com.warehouse.myshop.product.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

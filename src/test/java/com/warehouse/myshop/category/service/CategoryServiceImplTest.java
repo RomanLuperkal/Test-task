@@ -1,5 +1,6 @@
 package com.warehouse.myshop.category.service;
 
+import com.warehouse.myshop.category.CategoryTestBase;
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.category.dto.ListCategoryDto;
 import com.warehouse.myshop.category.dto.NewCategoryDto;
@@ -27,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-class CategoryServiceImplTest {
+class CategoryServiceImplTest extends CategoryTestBase {
     @Autowired
     private CategoryServiceImpl categoryService;
     @MockBean
@@ -39,11 +40,10 @@ class CategoryServiceImplTest {
 
     @Test
     void createCategoryTest() {
-       category = new Category();
-       initCategory(category);
+       category = createCategory();
        when(categoryRepository.save(any(Category.class))).thenReturn(category);
-       NewCategoryDto newCategoryDto = NewCategoryDto.builder().name(category.getName()).build();
-       CategoryDtoResp expectedCategory  = CategoryDtoResp.builder().id(1L).name(category.getName()).build();
+       NewCategoryDto newCategoryDto = createNewCategoryDto(category);
+       CategoryDtoResp expectedCategory  = createCategoryDtoResp(category);
 
        CategoryDtoResp actualCategory = categoryService.createCategory(newCategoryDto);
 
@@ -53,14 +53,11 @@ class CategoryServiceImplTest {
 
     @Test
     void updateCategoryTest() {
-        category = new Category();
-        initCategory(category);
+        category = createCategory();
         Category updatedCategory = new Category();
         updatedCategory.setName("testUpdatedCategory");
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        UpdateCategoryDto updateCategoryDto = UpdateCategoryDto.builder()
-                .name(updatedCategory.getName())
-                .build();
+        UpdateCategoryDto updateCategoryDto = createUpdatedCategoryDto(updatedCategory);
         CategoryDtoResp expectedCategory  = CategoryDtoResp.builder()
                 .id(category.getCategoryId())
                 .name(updatedCategory.getName())
@@ -75,13 +72,10 @@ class CategoryServiceImplTest {
     @Test
     void updateCategoryTestWhenCategoryWasNotFound() {
         category = new Category();
-        initCategory(category);
         Category updatedCategory = new Category();
         updatedCategory.setName("testUpdatedCategory");
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
-        UpdateCategoryDto updateCategoryDto = UpdateCategoryDto.builder()
-                .name(updatedCategory.getName())
-                .build();
+        UpdateCategoryDto updateCategoryDto = createUpdatedCategoryDto(category);
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> categoryService.updateCategory(updateCategoryDto, 1L));
@@ -111,13 +105,9 @@ class CategoryServiceImplTest {
 
     @Test
     void getCategoryByIdTest() {
-        category = new Category();
-        initCategory(category);
+        category = createCategory();
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        CategoryDtoResp expectedCategory  = CategoryDtoResp.builder()
-                .id(category.getCategoryId())
-                .name(category.getName())
-                .build();
+        CategoryDtoResp expectedCategory  = createCategoryDtoResp(category);
 
         CategoryDtoResp actualCategory = categoryService.getCategoryById(1L);
 
@@ -126,8 +116,7 @@ class CategoryServiceImplTest {
 
     @Test
     void getCategoryByIdTestWhenCategoryWasNotFound() {
-        category = new Category();
-        initCategory(category);
+        category = createCategory();
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class, () -> categoryService.getCategoryById(1L));
@@ -150,10 +139,5 @@ class CategoryServiceImplTest {
         ListCategoryDto actualCategories = categoryService.getCategories(pageable);
 
         assertEquals(expectedCategories.getCategories(), actualCategories.getCategories());
-    }
-
-    private void initCategory(Category category) {
-        category.setCategoryId(1L);
-        category.setName("testCategory");
     }
 }
