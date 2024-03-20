@@ -28,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDtoResp updateCategory(UpdateCategoryDto updateCategory, Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Категории с id=" + id + " не найдено"));
@@ -36,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id))
             throw new NotFoundException("Категории с id=" + id + " не найдено");

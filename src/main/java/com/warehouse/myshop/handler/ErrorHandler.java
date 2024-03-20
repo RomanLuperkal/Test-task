@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -18,6 +19,17 @@ public class ErrorHandler {
     private ResponseEntity<ApiError> handleException(MethodArgumentNotValidException e) {
         ApiError errorResponse = ApiError.builder()
                 .message(e.getFieldError().getDefaultMessage())
+                .reason("Неправильно сделанный запрос.")
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<ApiError> handleException(ConstraintViolationException e) {
+        ApiError errorResponse = ApiError.builder()
+                .message(e.getMessage())
                 .reason("Неправильно сделанный запрос.")
                 .status(HttpStatus.BAD_REQUEST.toString())
                 .time(LocalDateTime.now())

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.category.CategoryTestBase;
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.category.dto.NewCategoryDto;
+import com.warehouse.myshop.category.dto.UpdateCategoryDto;
 import com.warehouse.myshop.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,9 +18,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +36,9 @@ class CategoryControllerTest extends CategoryTestBase {
     private CategoryService categoryService;
     private static NewCategoryDto newCategoryDto;
     private static CategoryDtoResp categoryDtoResp;
+    private static UpdateCategoryDto updateCategoryDto;
+
+    private final String url = "/categories";
 
     @BeforeAll
     public static void createDto() {
@@ -43,6 +49,9 @@ class CategoryControllerTest extends CategoryTestBase {
                 .id(1L)
                 .name(newCategoryDto.getName())
                 .build();
+        updateCategoryDto = UpdateCategoryDto.builder()
+                .name("updateCategory")
+                .build();
 
     }
 
@@ -50,7 +59,7 @@ class CategoryControllerTest extends CategoryTestBase {
     @SneakyThrows
     void createCategoryTest() {
         when(categoryService.createCategory(any(NewCategoryDto.class))).thenReturn(categoryDtoResp);
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post(url)
                 .content(objectMapper.writeValueAsString(newCategoryDto))
                 .contentType(MediaType.APPLICATION_JSON))
 
@@ -64,7 +73,7 @@ class CategoryControllerTest extends CategoryTestBase {
     @SneakyThrows
     void createCategoryDuplicate() {
         when(categoryService.createCategory(any(NewCategoryDto.class))).thenThrow(DataIntegrityViolationException.class);
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post(url)
                         .content(objectMapper.writeValueAsString(newCategoryDto))
                         .contentType(MediaType.APPLICATION_JSON))
 
@@ -78,11 +87,52 @@ class CategoryControllerTest extends CategoryTestBase {
                 .name("  test")
                 .build();
         when(categoryService.createCategory(any(NewCategoryDto.class))).thenReturn(categoryDtoResp);
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post(url)
                         .content(objectMapper.writeValueAsString(invalidCategory))
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andExpect(
+                        status().isBadRequest()
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void updateCategoryTest() {
+        when(categoryService.updateCategory(any(UpdateCategoryDto.class), eq(1L))).thenReturn(categoryDtoResp);
+        mockMvc.perform(patch(url + "/1")
+                .content(objectMapper.writeValueAsString(updateCategoryDto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
+                        status().isOk(),
+                        content().json(objectMapper.writeValueAsString(categoryDtoResp))
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void updateInvalidNameCategory() {
+        UpdateCategoryDto invalidCategory = UpdateCategoryDto.builder()
+                .name("  test")
+                .build();
+        when(categoryService.updateCategory(any(UpdateCategoryDto.class), eq(1L))).thenReturn(categoryDtoResp);
+        mockMvc.perform(patch(url + "/1")
+                        .content(objectMapper.writeValueAsString(invalidCategory))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(
+                        status().isBadRequest()
+                ).andDo(print());
+    }
+
+    @Test
+    @SneakyThrows
+    void updateCategoryWhenInvalidPatchVariable() {
+        when(categoryService.updateCategory(any(UpdateCategoryDto.class), anyLong())).thenReturn(categoryDtoResp);
+        mockMvc.perform(patch(url + "/0")
+                        .content(objectMapper.writeValueAsString(updateCategoryDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpectAll(
                         status().isBadRequest()
                 );
     }
