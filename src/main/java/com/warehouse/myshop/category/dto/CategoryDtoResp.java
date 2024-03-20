@@ -1,14 +1,14 @@
 package com.warehouse.myshop.category.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Setter
+@Getter
 public class CategoryDtoResp {
     private Long id;
     private String name;
