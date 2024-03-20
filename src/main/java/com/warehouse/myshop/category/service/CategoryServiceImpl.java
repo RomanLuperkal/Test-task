@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -20,6 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper mapper;
 
     @Override
+    @Transactional
     public CategoryDtoResp createCategory(NewCategoryDto category) {
         Category newCategory = categoryRepository.save(mapper.mapToCategory(category));
         return mapper.mapToCategoryDtoResp(newCategory);

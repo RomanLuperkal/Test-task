@@ -1,13 +1,15 @@
 package com.warehouse.myshop.product.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 @Builder
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class NewProductDto {
     @NotBlank
     private String name;

@@ -1,13 +1,16 @@
 package com.warehouse.myshop.category.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-@Data
+
 @Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateCategoryDto {
     @NotBlank(message = "Field: name. Error: must not be blank. Value: null")
     @Pattern(regexp = "^[^ ].*[^ ]$", message = "Invalid name")

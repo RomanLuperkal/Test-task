@@ -1,14 +1,16 @@
 package com.warehouse.myshop.product.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Builder
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateProductDto {
     @Size(min = 4, max = 2000, message = "Некорректное имя")
     private String name;

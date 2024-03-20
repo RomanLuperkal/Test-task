@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -52,9 +53,37 @@ class CategoryControllerTest extends CategoryTestBase {
         mockMvc.perform(post("/categories")
                 .content(objectMapper.writeValueAsString(newCategoryDto))
                 .contentType(MediaType.APPLICATION_JSON))
+
                 .andExpectAll(
                         status().isCreated(),
                         content().json(objectMapper.writeValueAsString(categoryDtoResp))
+                );
+    }
+
+    @Test
+    @SneakyThrows
+    void createCategoryDuplicate() {
+        when(categoryService.createCategory(any(NewCategoryDto.class))).thenThrow(DataIntegrityViolationException.class);
+        mockMvc.perform(post("/categories")
+                        .content(objectMapper.writeValueAsString(newCategoryDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @SneakyThrows
+    void createInvalidNameCategory() {
+        NewCategoryDto invalidCategory = NewCategoryDto.builder()
+                .name("  test")
+                .build();
+        when(categoryService.createCategory(any(NewCategoryDto.class))).thenReturn(categoryDtoResp);
+        mockMvc.perform(post("/categories")
+                        .content(objectMapper.writeValueAsString(invalidCategory))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(
+                        status().isBadRequest()
                 );
     }
 }
