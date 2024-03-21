@@ -3,6 +3,7 @@ package com.warehouse.myshop.product.dto;
 import lombok.*;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
@@ -14,7 +15,7 @@ import javax.validation.constraints.Size;
 public class UpdateProductDto {
     @Size(min = 4, max = 2000, message = "Некорректное имя")
     private String name;
-    @Positive
+    @NotBlank
     private String articleNumber;
     @Size(min = 4, max = 7000, message = "Некорректное описание")
     private String description;
