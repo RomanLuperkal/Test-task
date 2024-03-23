@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -24,12 +25,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper mapper;
 
     @Override
+    @Transactional
     public ResponseProductDto createProduct(NewProductDto productDto) {
         Product product = productRepository.save(mapper.mapToProduct(productDto));
         return mapper.mapToResponseProductDto(product);
     }
 
     @Override
+    @Transactional
     public ResponseProductDto updateProduct(UUID uuid, UpdateProductDto productDto) {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
@@ -37,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(UUID uuid) {
         if (!productRepository.existsById(uuid))
             throw new NotFoundException("Товара с UUID=" + uuid + " не существует");

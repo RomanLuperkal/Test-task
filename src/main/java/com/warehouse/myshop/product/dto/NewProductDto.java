@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 @Builder
 @Setter
@@ -11,16 +13,16 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewProductDto {
-    @NotBlank
+    @Size(min = 4, max = 2000, message = "Некорректное имя")
     private String name;
-    @NotBlank
+    @NotBlank(message = "Недопустимый артикул")
     private String articleNumber;
-    @NotBlank
+    @Size(min = 4, max = 7000, message = "Некорректное описание")
     private String description;
-    @Positive
+    @Positive(message = "Некоректный индификатор категории")
     private Long categoryId;
-    @Positive
+    @Positive(message = "Недопустимая стоимость товара")
     private Double price;
-    @Positive
+    @PositiveOrZero(message = "Количество товара не может быть отрицательным")
     private Integer quantity;
 }

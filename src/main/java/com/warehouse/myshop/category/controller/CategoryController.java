@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,6 @@ public class CategoryController {
                                                          @RequestParam(defaultValue = "10") @Min(10) Integer size) {
         log.info("get categories: from: {},size: {}", from, size);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(categoryService.getCategories(PageRequest.of(from / size, size)));
+                .body(categoryService.getCategories(PageRequest.of(from / size, size, Sort.by("categoryId").ascending())));
     }
 }

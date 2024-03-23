@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateCategoryDto {
-    @NotBlank(message = "Field: name. Error: must not be blank. Value: null")
-    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Invalid name")
+    @NotBlank(message = "Недопустимое имя")
+    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Недопустимое имя")
     private String name;
 }
