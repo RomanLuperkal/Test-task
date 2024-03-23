@@ -1,14 +1,16 @@
 package com.warehouse.myshop.product.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 @Builder
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResponseProductDto {
     private UUID uuid;
     private String name;

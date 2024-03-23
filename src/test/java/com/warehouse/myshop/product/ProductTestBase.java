@@ -48,7 +48,7 @@ public abstract class ProductTestBase {
                 .articleNumber("te-st-article")
                 .description("test description")
                 .price(50.5)
-                .quantity(10)
+                .quantity(5)
                 .build();
     }
 
