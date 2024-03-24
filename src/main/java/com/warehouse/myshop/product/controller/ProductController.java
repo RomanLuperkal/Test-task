@@ -22,10 +22,10 @@ import java.util.UUID;
 @Slf4j
 @Validated
 public class ProductController {
-    @Qualifier("ProductServiceDecorator")
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+
+    public ProductController(@Qualifier("ProductServiceDecorator") ProductService productService) {
         this.productService = productService;
     }
 

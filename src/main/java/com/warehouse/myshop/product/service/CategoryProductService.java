@@ -6,18 +6,22 @@ import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service(value = "ProductServiceDecorator")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CategoryProductService implements ProductService {
     private final CategoryService categoryService;
+
     private final ProductService origin;
+
+    public CategoryProductService(CategoryService categoryService, @Qualifier("ProductService") ProductService origin) {
+        this.categoryService = categoryService;
+        this.origin = origin;
+    }
 
     @Override
     public ResponseProductDto createProduct(NewProductDto productDto) {

@@ -5,8 +5,6 @@ import com.warehouse.myshop.product.audit.ProductAudit;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -17,9 +15,7 @@ import java.util.UUID;
 @Setter
 public class Product {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    @Type(type = "uuid-char")
+    @GeneratedValue
     private UUID uuid;
     @Column(nullable = false)
     private String name;
@@ -34,7 +30,7 @@ public class Product {
     @Column(nullable = false)
     private Integer quantity;
     @Embedded
-    private ProductAudit productAudit;
+    private ProductAudit productAudit = new ProductAudit();
 
     @Override
     public boolean equals(Object o) {
