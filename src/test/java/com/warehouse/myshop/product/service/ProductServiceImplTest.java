@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.service;
 
+import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.ProductTestBase;
 import com.warehouse.myshop.product.dto.ListProductDto;
@@ -34,6 +35,8 @@ class ProductServiceImplTest extends ProductTestBase {
     private ProductService productService;
     @MockBean
     private ProductRepository productRepository;
+    @MockBean
+    private CategoryRepository categoryRepository;
     @Autowired
     ProductMapper mapper;
 

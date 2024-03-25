@@ -5,7 +5,9 @@ import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -21,13 +23,10 @@ import java.util.UUID;
 @RequestMapping("/products")
 @Slf4j
 @Validated
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProductController {
     private final ProductService productService;
 
-
-    public ProductController(@Qualifier("ProductServiceDecorator") ProductService productService) {
-        this.productService = productService;
-    }
 
     @PostMapping
     public ResponseEntity<ResponseProductDto> createProduct(@Valid @RequestBody NewProductDto productDto) {
