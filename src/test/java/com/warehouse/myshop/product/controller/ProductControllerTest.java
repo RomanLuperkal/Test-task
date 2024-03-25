@@ -2,6 +2,7 @@ package com.warehouse.myshop.product.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.product.ProductTestBase;
+import com.warehouse.myshop.product.audit.ProductAudit;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
@@ -25,9 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,15 +55,19 @@ public class ProductControllerTest extends ProductTestBase {
                 .price(50.5)
                 .quantity(10)
                 .build();
+
+        category.setId(newProductDto.getCategoryId());
+        ProductAudit productAudit = new ProductAudit();
+        productAudit.setCreationDate(LocalDateTime.now());
         responseProductDto = ResponseProductDto.builder()
                 .uuid(UUID.randomUUID())
                 .name(newProductDto.getName())
-                .categoryId(newProductDto.getCategoryId())
+                .category(category)
                 .articleNumber(newProductDto.getArticleNumber())
                 .description(newProductDto.getDescription())
                 .price(newProductDto.getPrice())
                 .quantity(newProductDto.getQuantity())
-                .creationDate(LocalDateTime.now())
+                .productAudit(productAudit)
                 .build();
         updateProductDto = UpdateProductDto.builder()
                 .categoryId(1L)

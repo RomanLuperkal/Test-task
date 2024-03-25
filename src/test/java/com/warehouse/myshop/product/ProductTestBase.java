@@ -1,5 +1,7 @@
 package com.warehouse.myshop.product;
 
+import com.warehouse.myshop.category.dto.CategoryDtoResp;
+import com.warehouse.myshop.product.audit.ProductAudit;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
@@ -14,30 +16,40 @@ public abstract class ProductTestBase {
     @Autowired
     private ProductMapper mapper;
 
+    protected final static CategoryDtoResp category = CategoryDtoResp.builder()
+            .name("CategoryName")
+            .build();
+
     protected ResponseProductDto createExpectedResponseDto(NewProductDto product) {
+       category.setId(product.getCategoryId());
+        ProductAudit productAudit = new ProductAudit();
+        productAudit.setCreationDate(LocalDateTime.now());
         return ResponseProductDto.builder()
                 .uuid(UUID.randomUUID())
                 .name(product.getName())
-                .categoryId(product.getCategoryId())
+                .category(category)
                 .articleNumber(product.getArticleNumber())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
-                .creationDate(LocalDateTime.now())
+                .productAudit(productAudit)
                 .build();
     }
 
     protected ResponseProductDto createExpectedResponseDto(UpdateProductDto product) {
+        category.setId(product.getCategoryId());
+        ProductAudit productAudit = new ProductAudit();
+        productAudit.setCreationDate(LocalDateTime.now().minusDays(1));
+        productAudit.setLastUpdate(LocalDateTime.now());
         return ResponseProductDto.builder()
                 .uuid(UUID.randomUUID())
                 .name(product.getName())
-                .categoryId(product.getCategoryId())
+                .category(category)
                 .articleNumber(product.getArticleNumber())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
-                .creationDate(LocalDateTime.now().minusDays(1))
-                .lastUpdate(LocalDateTime.now())
+                .productAudit(productAudit)
                 .build();
     }
 

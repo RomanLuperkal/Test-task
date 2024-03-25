@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.service;
 
+import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.ProductTestBase;
@@ -10,6 +11,7 @@ import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +40,15 @@ class ProductServiceImplTest extends ProductTestBase {
     @MockBean
     private CategoryRepository categoryRepository;
     @Autowired
-    ProductMapper mapper;
+    private ProductMapper mapper;
+    private static Category category;
+
+    @BeforeAll
+    public static void createCategory() {
+        category = new Category();
+        category.setCategoryId(1L);
+        category.setName("testCategory");
+    }
 
     @Test
     void createProductTest() {
@@ -49,11 +59,30 @@ class ProductServiceImplTest extends ProductTestBase {
         ResponseProductDto expectedProductDto = createExpectedResponseDto(product);
         expectedProductDto.setUuid(uuid);
         when(productRepository.save(any(Product.class))).thenReturn(expectedProduct);
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
         ResponseProductDto actualProduct = productService.createProduct(product);
 
         assertEquals(expectedProductDto, actualProduct);
         verify(productRepository, times(1)).save(any(Product.class));
+        verify(categoryRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void CreateProductWhenCategoryNotExist() {
+        String expectedMessage = "Категории с id=" + category.getCategoryId() + " не найдено";
+        NewProductDto product = createNewProductDto();
+        UUID uuid = UUID.randomUUID();
+        Product expectedProduct = createProduct(product, uuid);
+        expectedProduct.setUuid(uuid);
+        ResponseProductDto expectedProductDto = createExpectedResponseDto(product);
+        expectedProductDto.setUuid(uuid);
+        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NotFoundException e = assertThrows(NotFoundException.class, () -> productService.createProduct(product));
+
+        assertThat(e.getMessage()).contains(expectedMessage);
+        verify(categoryRepository, times(1)).findById(anyLong());
     }
 
     @Test
@@ -63,6 +92,7 @@ class ProductServiceImplTest extends ProductTestBase {
         Product product = createProduct(createNewProductDto(), expectedProductDto.getUuid());
         product.setPrice(10d);
         when(productRepository.findById(expectedProductDto.getUuid())).thenReturn(Optional.of(product));
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
         ResponseProductDto actualProduct = productService.updateProduct(expectedProductDto.getUuid(), updateProduct);
 
@@ -71,11 +101,28 @@ class ProductServiceImplTest extends ProductTestBase {
     }
 
     @Test
+    void UpdateProductWhenCategoryWasNotFound() {
+        String expectedMessage = "Категории с id=" + category.getCategoryId() + " не найдено";
+        UpdateProductDto updateProduct = createUpdateProductDto();
+        ResponseProductDto expectedProductDto = createExpectedResponseDto(updateProduct);
+        Product product = createProduct(createNewProductDto(), expectedProductDto.getUuid());
+        product.setPrice(10d);
+        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> productService.updateProduct(expectedProductDto.getUuid(), updateProduct));
+
+        assertThat(e.getMessage()).contains(expectedMessage);
+        verify(categoryRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
     void updateProductTestWhenProductWasNotFound() {
         UpdateProductDto updateProduct = createUpdateProductDto();
         ResponseProductDto expectedProductDto = createExpectedResponseDto(updateProduct);
         String expectedMessage = "Товара с UUID=" + expectedProductDto.getUuid() + " не существует";
         when(productRepository.findById(expectedProductDto.getUuid())).thenReturn(Optional.empty());
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> productService.updateProduct(expectedProductDto.getUuid(), updateProduct));

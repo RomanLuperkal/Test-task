@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.mapper;
 
+import com.warehouse.myshop.category.mapper.CategoryMapper;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
 public interface ProductMapper {
     @Mapping(target = "category", ignore = true)
     Product mapToProduct(NewProductDto productDto);

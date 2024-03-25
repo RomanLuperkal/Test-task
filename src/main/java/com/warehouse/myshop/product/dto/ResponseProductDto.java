@@ -1,8 +1,9 @@
 package com.warehouse.myshop.product.dto;
 
+import com.warehouse.myshop.category.dto.CategoryDtoResp;
+import com.warehouse.myshop.product.audit.ProductAudit;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,11 +17,10 @@ public class ResponseProductDto {
     private String name;
     private String articleNumber;
     private String description;
-    private Long categoryId;
+    private CategoryDtoResp category;
     private Double price;
     private Integer quantity;
-    private LocalDateTime lastUpdate;
-    private LocalDateTime creationDate;
+    private ProductAudit productAudit;
 
     @Override
     public boolean equals(Object o) {
