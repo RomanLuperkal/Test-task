@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         product.setCategory(category);
+        product.getProductAudit().setLastUpdate(LocalDateTime.now());
         return mapper.mapToResponseProductDto(mapper.mapToProduct(product, productDto));
     }
 
