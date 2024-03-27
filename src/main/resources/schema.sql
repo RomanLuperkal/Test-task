@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS product (
     uuid           UUID PRIMARY KEY,
     name           VARCHAR NOT NULL,
-    article_number VARCHAR NOT NULL UNIQUE ,
+    article_number VARCHAR NOT NULL,
     description    VARCHAR,
     category_id    BIGINT REFERENCES categories (category_id) ON DELETE RESTRICT NOT NULL ,
     price          NUMERIC(6,2) NOT NULL,
