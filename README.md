@@ -14,7 +14,7 @@
 
 1. Чтобы запустить приложение локально нужна запущенная бд Postgres. С помощью pgAdmin или других UI для 
 взаимодействия с бд создайте базу данных со след параметрами:
-    1) 
+    
         * POSTGRES_USER = postgres
         * POSTGRES_PASSWORD = admin
         * POSTGRES_DB = my-shop
