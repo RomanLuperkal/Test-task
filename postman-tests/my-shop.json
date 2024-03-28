@@ -1,0 +1,2054 @@
+{
+	"info": {
+		"_postman_id": "5e2484e3-d94d-47f6-bd15-8f3965d1b908",
+		"name": "my-shop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23143745"
+	},
+	"item": [
+		{
+			"name": "category",
+			"item": [
+				{
+					"name": "add invalid category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Недопустимое имя');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"  test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(201);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('id');\r",
+									"    pm.expect(actual.id).to.not.be.null;\r",
+									"    pm.expect(typeof actual.id).eql(\"number\");\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add category2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(201);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('id');\r",
+									"    pm.expect(actual.id).to.not.be.null;\r",
+									"    pm.expect(typeof actual.id).eql(\"number\");\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add duplicate category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(409);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Ограничение целостности базы данных была нарушена.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid update category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Недопустимое имя');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"  update_test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update category with invalid id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"updated test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update category when id not exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Категории с id=999999 не найдено');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Требуемый объект не был найден.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"updated_category\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "999999"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('id');\r",
+									"    pm.expect(actual.id).to.not.be.null;\r",
+									"    pm.expect(typeof actual.id).eql(\"number\");\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"updated test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/{{category_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update category with duplicate name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(409);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Ограничение целостности базы данных была нарушена.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/{{category_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get category with invalid id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get category when id not exists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Категории с id=999999999 не найдено');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Требуемый объект не был найден.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "999999999"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Данные в ответе совпадают с ожидаемыми\", () => {\r",
+									"    var response = pm.response.json();\r",
+									"\r",
+									"    pm.expect(response.name, '\"name\" field').eq('updated test');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories/{{category_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get categories",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса совпадает с ожидаемым\", () => {\r",
+									"    pm.expect(pm.response.code).to.eq(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Данные в ответе совпадают с ожидаемыми\", () => {\r",
+									"    var response = pm.response.json();\r",
+									"\r",
+									"    pm.expect(response[0].name, '\"name\" field').eq('updated test');\r",
+									"    pm.expect(response[1].name, '\"name\" field').eq('test2');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories?from=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'test2');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+									"    pm.response.to.have.status(204);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories/{{category_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "add invalid product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Недопустимый артикул');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test product\",\r\n    \"description\": \"test description\",\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product with not exist category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.message, '\"message\" field').eq('Некоректный индификатор категории');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test product\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": -999,\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(201);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('uuid');\r",
+									"    pm.expect(actual.uuid).to.not.be.null;\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"    pm.expect(actual).to.have.property('articleNumber');\r",
+									"    pm.expect(actual).to.have.property('description');\r",
+									"    pm.expect(actual).to.have.property('category');\r",
+									"    pm.expect(actual).to.have.property('price');\r",
+									"    pm.expect(actual).to.have.property('quantity');\r",
+									"    pm.expect(actual).to.have.property('productAudit');\r",
+									"    pm.expect(actual.productAudit.creationDate).to.not.be.null;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя товара в ответе не соответсвует имени товара в запросе');\r",
+									"    pm.expect(actual.articuleNumber).equal(source.articuleNumber, 'Артикул в ответе не соответсвует артикулу в запросе');\r",
+									"    pm.expect(actual.description).equal(source.description, 'Описание товара в ответе не соответсвует описанию товара в запросе');\r",
+									"    pm.expect(actual.category.id).equal(source.categoryId, 'Id категории в ответе не соответсвует id категории в запросе');\r",
+									"    pm.expect(actual.price).equal(source.price, 'Цена товара в ответе не соответсвует цене товара в запросе');\r",
+									"    pm.expect(actual.quantity).equal(source.quantity, 'Количество товара в ответе не соответсвует количеству товара в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test product\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(201);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('uuid');\r",
+									"    pm.expect(actual.uuid).to.not.be.null;\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"    pm.expect(actual).to.have.property('articleNumber');\r",
+									"    pm.expect(actual).to.have.property('description');\r",
+									"    pm.expect(actual).to.have.property('category');\r",
+									"    pm.expect(actual).to.have.property('price');\r",
+									"    pm.expect(actual).to.have.property('quantity');\r",
+									"    pm.expect(actual).to.have.property('productAudit');\r",
+									"    pm.expect(actual.productAudit.creationDate).to.not.be.null;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя товара в ответе не соответсвует имени товара в запросе');\r",
+									"    pm.expect(actual.articuleNumber).equal(source.articuleNumber, 'Артикул в ответе не соответсвует артикулу в запросе');\r",
+									"    pm.expect(actual.description).equal(source.description, 'Описание товара в ответе не соответсвует описанию товара в запросе');\r",
+									"    pm.expect(actual.category.id).equal(source.categoryId, 'Id категории в ответе не соответсвует id категории в запросе');\r",
+									"    pm.expect(actual.price).equal(source.price, 'Цена товара в ответе не соответсвует цене товара в запросе');\r",
+									"    pm.expect(actual.quantity).equal(source.quantity, 'Количество товара в ответе не соответсвует количеству товара в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test product2\",\r\n    \"articleNumber\": \"12345-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add duplicate product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(409);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Ограничение целостности базы данных была нарушена.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test product2\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid update product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/products/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const product = array.find(e => e.name === 'test product');\r",
+									"        const uuid = product ? product.uuid : null\r",
+									"        pm.variables.set('uuid', uuid);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(body.message, '\"message\" field').eq('Недопустимая стоимость товара');\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update test product\",\r\n    \"description\": \"test description\",\r\n    \"articuleNumber\": \"1234-abcd\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 0,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product with invalid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update test product\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/qwe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"qwe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product witch not exists uuid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const uuid = require('uuid');\r",
+									"const randomUUID = uuid.v4();\r",
+									"pm.variables.set('uuid', randomUUID);\r",
+									"\r",
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Требуемый объект не был найден.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update test product\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product with duplicate articule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/products/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const product = array.find(e => e.name === 'test product');\r",
+									"        const uuid = product ? product.uuid : null\r",
+									"        pm.variables.set('uuid', uuid);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(409);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Ограничение целостности базы данных была нарушена.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update test product\",\r\n    \"articleNumber\": \"12345-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/products/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const product = array.find(e => e.name === 'test product');\r",
+									"        const uuid = product ? product.uuid : null\r",
+									"        pm.variables.set('uuid', uuid);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/categories/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const category = array.find(e => e.name === 'updated test');\r",
+									"        const category_id = category ? category.id : null\r",
+									"        pm.variables.set('category_id', category_id);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"const source = JSON.parse(pm.request.body.raw);\r",
+									"const actual = pm.response.json();\r",
+									"console.log('source name: ' + source.name);\r",
+									"console.log('actual name: ' + actual.name);\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('uuid');\r",
+									"    pm.expect(actual.uuid).to.not.be.null;\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"    pm.expect(actual).to.have.property('articleNumber');\r",
+									"    pm.expect(actual).to.have.property('description');\r",
+									"    pm.expect(actual).to.have.property('category');\r",
+									"    pm.expect(actual).to.have.property('price');\r",
+									"    pm.expect(actual).to.have.property('quantity');\r",
+									"    pm.expect(actual).to.have.property('productAudit');\r",
+									"    pm.expect(actual.productAudit).to.not.be.null;\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Поля в теле ответа содержат ожидаемые значения\", ()=> {\r",
+									"    pm.expect(actual.name).equal(source.name, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"    pm.expect(actual.articleNumber).equal(source.articleNumber, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"    pm.expect(actual.description).equal(source.description, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"    pm.expect(actual.price).equal(source.price, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"    pm.expect(actual.category.id).equal(source.categoryId, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"    pm.expect(actual.quantity).equal(source.quantity, 'Имя категории в ответе не соответсвует имени категории в запросе');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"update test product\",\r\n    \"articleNumber\": \"1234-abcd\",\r\n    \"description\": \"test description\",\r\n    \"categoryId\": {{category_id}},\r\n    \"price\": 10.5,\r\n    \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get product with invalid uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Неправильно сделанный запрос.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/qwe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"qwe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get product when uuid not exists",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const uuid = require('uuid');\r",
+									"const randomUUID = uuid.v4();\r",
+									"pm.variables.set('uuid', randomUUID);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", () => {\r",
+									"    pm.response.to.have.status(404);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+									"    var body = pm.response.json();\r",
+									"\r",
+									"    pm.expect(body.reason, '\"reason\" field').eq('Требуемый объект не был найден.');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/products/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const product = array.find(e => e.name === 'update test product');\r",
+									"        const uuid = product ? product.uuid : null\r",
+									"        pm.variables.set('uuid', uuid);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса соответсвует ожидаемому\", ()=> {\r",
+									"pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"const actual = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.test(\"Тело ответа содержит ожидаемые поля\", ()=> {\r",
+									"    pm.expect(actual).to.have.property('uuid');\r",
+									"    pm.expect(actual.uuid).to.not.be.null;\r",
+									"    pm.expect(actual).to.have.property('name');\r",
+									"    pm.expect(actual).to.have.property('articleNumber');\r",
+									"    pm.expect(actual).to.have.property('description');\r",
+									"    pm.expect(actual).to.have.property('category');\r",
+									"    pm.expect(actual).to.have.property('price');\r",
+									"    pm.expect(actual).to.have.property('quantity');\r",
+									"    pm.expect(actual).to.have.property('productAudit');\r",
+									"    pm.expect(actual.productAudit.creationDate).to.not.be.null;\r",
+									"    pm.expect(actual.productAudit.lastUpdate).to.not.be.null;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса совпадает с ожидаемым\", () => {\r",
+									"    pm.expect(pm.response.code).to.eq(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Данные в ответе совпадают с ожидаемыми\", () => {\r",
+									"    var response = pm.response.json();\r",
+									"\r",
+									"    pm.expect(response[0].name, '\"name\" field').eq('test product2');\r",
+									"    pm.expect(response[1].name, '\"name\" field').eq('update test product');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete updated product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const base_url = pm.variables.get(\"baseUrl\");\r",
+									"pm.sendRequest({\r",
+									"    url: base_url + \"/products/?from=0&size=10\",\r",
+									"    method: \"GET\"\r",
+									"}, function(err, response) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"    } else {\r",
+									"        const array = response.json();\r",
+									"        const product = array.find(e => e.name === 'update test product');\r",
+									"        const uuid = product ? product.uuid : null\r",
+									"        pm.variables.set('uuid', uuid);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+									"    pm.response.to.have.status(204);\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{uuid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"{{uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "delete used category",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const base_url = pm.variables.get(\"baseUrl\");\r",
+							"pm.sendRequest({\r",
+							"    url: base_url + \"/categories/?from=0&size=10\",\r",
+							"    method: \"GET\"\r",
+							"}, function(err, response) {\r",
+							"    if (err) {\r",
+							"        console.error(err);\r",
+							"    } else {\r",
+							"        const array = response.json();\r",
+							"        const category = array.find(e => e.name === 'updated test');\r",
+							"        const category_id = category ? category.id : null\r",
+							"        pm.variables.set('category_id', category_id);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+							"    pm.response.to.have.status(409);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Тело ответа соответсвует ожидаемому\", ()=> {\r",
+							"    var body = pm.response.json();\r",
+							"\r",
+							"    pm.expect(body.reason, '\"reason\" field').eq('Ограничение целостности базы данных была нарушена.');\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/categories/{{category_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"categories",
+						"{{category_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete product2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const base_url = pm.variables.get(\"baseUrl\");\r",
+							"pm.sendRequest({\r",
+							"    url: base_url + \"/products/?from=0&size=10\",\r",
+							"    method: \"GET\"\r",
+							"}, function(err, response) {\r",
+							"    if (err) {\r",
+							"        console.error(err);\r",
+							"    } else {\r",
+							"        const array = response.json();\r",
+							"        const product = array.find(e => e.name === 'test product2');\r",
+							"        const uuid = product ? product.uuid : null\r",
+							"        pm.variables.set('uuid', uuid);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+							"    pm.response.to.have.status(204);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/products/{{uuid}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"products",
+						"{{uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete update category",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const base_url = pm.variables.get(\"baseUrl\");\r",
+							"pm.sendRequest({\r",
+							"    url: base_url + \"/categories/?from=0&size=10\",\r",
+							"    method: \"GET\"\r",
+							"}, function(err, response) {\r",
+							"    if (err) {\r",
+							"        console.error(err);\r",
+							"    } else {\r",
+							"        const array = response.json();\r",
+							"        const category = array.find(e => e.name === 'updated test');\r",
+							"        const category_id = category ? category.id : null\r",
+							"        pm.variables.set('category_id', category_id);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Код статуса совпадает с ожидаемым\", ()=> {\r",
+							"    pm.response.to.have.status(204);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/categories/{{category_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"categories",
+						"{{category_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	]
+}

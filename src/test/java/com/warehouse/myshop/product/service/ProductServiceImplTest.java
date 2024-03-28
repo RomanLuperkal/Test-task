@@ -187,7 +187,7 @@ class ProductServiceImplTest extends ProductTestBase {
         Product product = createProduct(createNewProductDto(), UUID.randomUUID());
         List<Product> products = List.of(product);
         Pageable pageable = PageRequest.of(0, 1);
-        Page<Product> page = new PageImpl<>(products,pageable,products.size());
+        Page<Product> page = new PageImpl<>(products, pageable, products.size());
         ListProductDto expectedProducts = ListProductDto.builder().
                 products(mapper.mapToListResponseProductDto(page)).build();
         when(productRepository.findAll(pageable)).thenReturn(page);

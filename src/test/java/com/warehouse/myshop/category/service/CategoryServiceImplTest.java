@@ -42,15 +42,15 @@ class CategoryServiceImplTest extends CategoryTestBase {
 
     @Test
     void createCategoryTest() {
-       category = createCategory();
-       when(categoryRepository.save(any(Category.class))).thenReturn(category);
-       NewCategoryDto newCategoryDto = createNewCategoryDto(category);
-       CategoryDtoResp expectedCategory  = createCategoryDtoResp(category);
+        category = createCategory();
+        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+        NewCategoryDto newCategoryDto = createNewCategoryDto(category);
+        CategoryDtoResp expectedCategory = createCategoryDtoResp(category);
 
-       CategoryDtoResp actualCategory = categoryService.createCategory(newCategoryDto);
+        CategoryDtoResp actualCategory = categoryService.createCategory(newCategoryDto);
 
-       assertEquals(expectedCategory, actualCategory);
-       verify(categoryRepository, times(1)).save(any(Category.class));
+        assertEquals(expectedCategory, actualCategory);
+        verify(categoryRepository, times(1)).save(any(Category.class));
     }
 
     @Test
@@ -60,7 +60,7 @@ class CategoryServiceImplTest extends CategoryTestBase {
         updatedCategory.setName("testUpdatedCategory");
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         UpdateCategoryDto updateCategoryDto = createUpdatedCategoryDto(updatedCategory);
-        CategoryDtoResp expectedCategory  = CategoryDtoResp.builder()
+        CategoryDtoResp expectedCategory = CategoryDtoResp.builder()
                 .id(category.getCategoryId())
                 .name(updatedCategory.getName())
                 .build();
@@ -68,7 +68,6 @@ class CategoryServiceImplTest extends CategoryTestBase {
         CategoryDtoResp actualCategory = categoryService.updateCategory(updateCategoryDto, 1L);
 
         assertEquals(expectedCategory, actualCategory);
-        //verify(categoryRepository, times(0)).save(any(Category.class));
     }
 
     @Test
@@ -109,7 +108,7 @@ class CategoryServiceImplTest extends CategoryTestBase {
     void getCategoryByIdTest() {
         category = createCategory();
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        CategoryDtoResp expectedCategory  = createCategoryDtoResp(category);
+        CategoryDtoResp expectedCategory = createCategoryDtoResp(category);
 
         CategoryDtoResp actualCategory = categoryService.getCategoryById(1L);
 
@@ -130,11 +129,11 @@ class CategoryServiceImplTest extends CategoryTestBase {
         List<Category> categories = List.of(new Category(1L, "testCategory"),
                 new Category(2L, "testCategory"));
         Pageable pageable = PageRequest.of(0, 2);
-        Page<Category> page = new PageImpl<>(categories,pageable,categories.size());
+        Page<Category> page = new PageImpl<>(categories, pageable, categories.size());
         ListCategoryDto expectedCategories =
                 ListCategoryDto.builder()
-                .categories(mapper.mapToListCategoryDto(page))
-                .build();
+                        .categories(mapper.mapToListCategoryDto(page))
+                        .build();
 
         when(categoryRepository.findAll(pageable)).thenReturn(page);
 
