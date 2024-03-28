@@ -1,6 +1,6 @@
 ---
 
-# *Java-explore-with-me*
+# *My-shop*
 
 Описание проекта
 -
