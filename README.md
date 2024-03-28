@@ -16,7 +16,7 @@
 взаимодействия с бд создайте базу данных со след параметрами:
     1) 
         * POSTGRES_USER = postgres
-        * POSTGRES_PASSWORD = admim
+        * POSTGRES_PASSWORD = admin
         * POSTGRES_DB = my-shop
 2. Так же возможен запуск проекта в docker.
 3. Команда "docker-compose up" запускает приложение с его бд в отдельных контейнерах вв docker-compose
