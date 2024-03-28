@@ -21,6 +21,6 @@
 2. Так же возможен запуск проекта в docker.
 3. Команда "docker-compose up" запускает приложение с его бд в отдельных контейнерах вв docker-compose
 4. Для проверки работоспособности приложения предусмотрены постан тесты:
-    - [postman-tests](https://github.com/RomanLuperkal/java-explore-with-me/blob/main/postman/Explore%20With%20Me%20-%20Main%20service.json)
-    - [ewm-statistic](https://github.com/RomanLuperkal/java-explore-with-me/blob/main/postman/Explore%20with%20me-%20API%20%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0.json)
-    - [ewm-service-comments](https://github.com/RomanLuperkal/java-explore-with-me/blob/main/postman/feature.json)
+    - [postman-tests](https://github.com/RomanLuperkal/Test-task/blob/develop/postman-tests/my-shop.json)
+5.Так же для приложения имеется сформированый файл спецификации swagger
+    - [swagger OAS](https://github.com/RomanLuperkal/Test-task/blob/develop/swagger/my-shop-OAS.json)
