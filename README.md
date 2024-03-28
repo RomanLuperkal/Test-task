@@ -22,5 +22,6 @@
 3. Команда "docker-compose up" запускает приложение с его бд в отдельных контейнерах вв docker-compose
 4. Для проверки работоспособности приложения предусмотрены постан тесты:
     - [postman-tests](https://github.com/RomanLuperkal/Test-task/blob/develop/postman-tests/my-shop.json)
-5.Так же для приложения имеется сформированый файл спецификации swagger
+
+5. Так же для приложения имеется сформированый файл спецификации swagger
     - [swagger OAS](https://github.com/RomanLuperkal/Test-task/blob/develop/swagger/my-shop-OAS.json)
