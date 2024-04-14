@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
     @Column(nullable = false)
-    private BigDecimal price;
+    private Double price;
     @Column(nullable = false)
     private Integer quantity;
     @Embedded
