@@ -19,8 +19,8 @@ import java.util.Objects;
 public class Category {
     @Id
     @Column(name = "category_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "categories_category_id_seq")
-    @SequenceGenerator(name = "categories_category_id_seq", sequenceName = "categories_category_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
+    @SequenceGenerator(name = "category_seq", sequenceName = "category_seq", allocationSize = 1)
     private Long categoryId;
     @Column(nullable = false, unique = true)
     private String name;
