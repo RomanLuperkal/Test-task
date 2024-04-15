@@ -19,3 +19,6 @@ app:
   scheduling:
     enabled: true
     period: 10000
+    priceIncrease: 10.1
+    optimization: false
+
