@@ -14,3 +14,8 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
+
+app:
+  scheduling:
+    enabled: true
+    period: 10000
