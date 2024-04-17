@@ -103,7 +103,7 @@ public class OptimizedProductPriceScheduler {
         File file = new File(filePath);
         ResultSet rs;
         final String productFields = "uuid, name, article_number, description, " +
-                "category_id, price, quantity, last_update, creation_date";
+                "category_id, price, quantity, last_update, creation_date\n";
         final String format = "%s, %s, %s, %s, %d, %.2f, %d, %s, %s\n";
 
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM product");
