@@ -20,5 +20,5 @@ app:
     enabled: true
     period: 5000
     priceIncrease: 10.1
-    optimization: false
+    optimization: true
 

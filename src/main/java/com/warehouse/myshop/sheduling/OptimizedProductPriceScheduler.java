@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public class OptimizedProductPriceScheduler {
 
     @PersistenceContext
     private EntityManager entityManager;
-    private final String updateQuery = "UPDATE product set price = price + ?";
+    final String filePath = "src/main/resources/updatedProducts.txt";
 
     @Scheduled(fixedDelayString = "${app.scheduling.period}")
     @TimeTrack
@@ -31,24 +31,24 @@ public class OptimizedProductPriceScheduler {
         log.info("Start optimized scheduler");
         Session session = entityManager.unwrap(Session.class);
         session.doWork(connection -> {
-            int pageSize = 1000;
+            long pageSize = calculatePageSize(connection);
             try {
                 connection.setAutoCommit(false);
 
-
-                boolean moreRows = true;
-                int offset = 0;
-                while (moreRows) {
+                long offset = 0L;
+                long updatedRows = 0L;
+                while (true) {
                     List<UUID> batch = fetchUuids(connection, pageSize, offset);
                     if (batch.isEmpty()) {
-                        moreRows = false;
+                        break;
                     } else {
-                        updatePrices(connection, batch);
+                        updatedRows += updatePrices(connection, batch).length;
                     }
                     offset += pageSize;
-                    System.out.println("Обновлено " + offset + " строк");
+                    System.out.println("Обновлено " + updatedRows + " строк");
                 }
                 connection.commit();
+                saveToFile(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -56,12 +56,12 @@ public class OptimizedProductPriceScheduler {
         log.info("End optimized scheduler");
     }
 
-    private static List<UUID> fetchUuids(Connection conn, int pageSize, int offset) throws SQLException {
+    private List<UUID> fetchUuids(Connection conn, long pageSize, long offset) throws SQLException {
         List<UUID> uuids = new ArrayList<>();
         String sql = "SELECT uuid FROM product ORDER BY uuid LIMIT ? OFFSET ?";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setInt(1, pageSize);
-            statement.setInt(2, offset);
+            statement.setLong(1, pageSize);
+            statement.setLong(2, offset);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 uuids.add(UUID.fromString(rs.getString("uuid")));
@@ -70,14 +70,48 @@ public class OptimizedProductPriceScheduler {
         return uuids;
     }
 
-    private static void updatePrices(Connection conn, List<UUID> uuids) throws SQLException {
+    private int[] updatePrices(Connection conn, List<UUID> uuids) throws SQLException {
         String updateSQL = "UPDATE product SET price = price + 10 WHERE uuid = ?";
         try (PreparedStatement statement = conn.prepareStatement(updateSQL)) {
             for (UUID uuid : uuids) {
                 statement.setObject(1, uuid);
                 statement.addBatch();
             }
-            statement.executeBatch();
+            return statement.executeBatch();
+        }
+    }
+
+    private long calculatePageSize(Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareCall("SELECT count(*) FROM product")) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return Math.round(resultSet.getInt(1) * 0.1);
+            }
+            return 1;
+        }
+    }
+
+    private void saveToFile(Connection connection) throws SQLException {
+        File file = new File(filePath);
+        ResultSet rs;
+
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM product");
+             FileWriter writer = new FileWriter(file, true)){
+            if (file.length() == 0) {
+                writer.write("uuid, name, article_number, description, category_id, price, quantity, last_update, creation_date");
+            }
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                String format = "%s, %s, %s, %s, %d, %.2f, %d, %s, %s\n";
+                writer.write(String.format(format, rs.getObject("uuid"), rs.getString("name"),
+                        rs.getString("article_number"), rs.getString("description"),
+                        rs.getLong("category_id"), rs.getBigDecimal("price"),
+                        rs.getLong("quantity"), rs.getString("last_update"),
+                        rs.getString("creation_date")));
+            }
+        } catch (IOException e) {
+            System.err.println("Произошла ошибка при записи в файл: " + e.getMessage());
         }
     }
 }
+
