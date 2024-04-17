@@ -1,5 +1,6 @@
 package com.warehouse.myshop.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,6 +12,7 @@ import java.time.Instant;
 
 @Aspect
 @Component
+@Slf4j
 public class TimeTrackAspect {
     @Around("@annotation(com.warehouse.myshop.anotation.TimeTrack)")
     public Object timeTrack(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -25,7 +27,7 @@ public class TimeTrackAspect {
              Duration duration = Duration.between(start, end);
              long minutes = duration.toMinutes();
              long seconds = duration.getSeconds() % 60;
-             System.out.println("Время выполнения метода " + method + " класса " + className + ": "+ minutes + "мин "
+             log.info("Время выполнения метода " + method + " класса " + className + ": "+ minutes + "мин "
                      + seconds + "сек");
          }
     }
