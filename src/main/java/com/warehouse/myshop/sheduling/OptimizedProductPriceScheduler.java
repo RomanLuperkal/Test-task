@@ -21,6 +21,8 @@ import java.util.UUID;
 public class OptimizedProductPriceScheduler {
     @Value("#{new java.math.BigDecimal(\"${app.scheduling.priceIncrease}\")}")
     private BigDecimal priceIncrease;
+    @Value("${app.scheduling.exclusive-lock}")
+    private Boolean isLock;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -32,22 +34,27 @@ public class OptimizedProductPriceScheduler {
         log.info("Start optimized scheduler");
         Session session = entityManager.unwrap(Session.class);
         session.doWork(connection -> {
+            long offset = 0L;
+            long updatedRows = 0L;
             long pageSize = calculatePageSize(connection);
+
             try {
                 connection.setAutoCommit(false);
+                if (isLock)
+                    lockTable(connection);
 
-                long offset = 0L;
-                long updatedRows = 0L;
                 while (true) {
                     List<UUID> batch = fetchUuids(connection, pageSize, offset);
                     if (batch.isEmpty()) {
                         break;
-                    } else {
-                        updatedRows += updatePrices(connection, batch).length;
                     }
+
+                    updatedRows += updatePrices(connection, batch).length;
+
                     offset += pageSize;
                     System.out.println("Обновлено " + updatedRows + " строк");
                 }
+
                 connection.commit();
                 saveToFile(connection);
             } catch (SQLException e) {
@@ -95,16 +102,19 @@ public class OptimizedProductPriceScheduler {
     private void saveToFile(Connection connection) throws SQLException {
         File file = new File(filePath);
         ResultSet rs;
+        final String productFields = "uuid, name, article_number, description, " +
+                "category_id, price, quantity, last_update, creation_date";
+        final String format = "%s, %s, %s, %s, %d, %.2f, %d, %s, %s\n";
 
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM product");
              FileWriter writer = new FileWriter(file, true)){
             if (file.length() == 0) {
-                writer.write("uuid, name, article_number, description, category_id, price, quantity, last_update, creation_date");
+                writer.write(productFields);
             }
             rs = statement.executeQuery();
             while (rs.next()) {
-                String format = "%s, %s, %s, %s, %d, %.2f, %d, %s, %s\n";
-                writer.write(String.format(format, rs.getObject("uuid"), rs.getString("name"),
+                writer.write(String.format(format, rs.getObject("uuid"),
+                        rs.getString("name"),
                         rs.getString("article_number"), rs.getString("description"),
                         rs.getLong("category_id"), rs.getBigDecimal("price"),
                         rs.getLong("quantity"), rs.getString("last_update"),
@@ -112,6 +122,13 @@ public class OptimizedProductPriceScheduler {
             }
         } catch (IOException e) {
             System.err.println("Произошла ошибка при записи в файл: " + e.getMessage());
+        }
+    }
+
+    private void lockTable(Connection connection) throws SQLException {
+        String lockTableQuery = "LOCK TABLE product IN ACCESS EXCLUSIVE MODE";
+        try (PreparedStatement statement = connection.prepareStatement(lockTableQuery)){
+            statement.execute();
         }
     }
 }

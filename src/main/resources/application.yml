@@ -21,4 +21,5 @@ app:
     period: 5000
     priceIncrease: 10.1
     optimization: true
+    exclusive-lock: false
 
