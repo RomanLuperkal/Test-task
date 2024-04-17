@@ -23,7 +23,7 @@
                              referencedTableName="categories" referencedColumnNames="category_id"
                              deleteCascade="false"/>
             </column>
-            <column name="price" type="DOUBLE PRECISION">
+            <column name="price" type="NUMERIC(19, 2)">
                 <constraints nullable="false"/>
             </column>
             <column name="quantity" type="INTEGER">

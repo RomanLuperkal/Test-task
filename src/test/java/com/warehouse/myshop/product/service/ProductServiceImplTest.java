@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -92,7 +93,7 @@ class ProductServiceImplTest extends ProductTestBase {
         UpdateProductDto updateProduct = createUpdateProductDto();
         ResponseProductDto expectedProductDto = createExpectedResponseDto(updateProduct);
         Product product = createProduct(createNewProductDto(), expectedProductDto.getUuid());
-        product.setPrice(10d);
+        product.setPrice(BigDecimal.valueOf(10));
         when(productRepository.findById(expectedProductDto.getUuid())).thenReturn(Optional.of(product));
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
 
@@ -108,7 +109,7 @@ class ProductServiceImplTest extends ProductTestBase {
         UpdateProductDto updateProduct = createUpdateProductDto();
         ResponseProductDto expectedProductDto = createExpectedResponseDto(updateProduct);
         Product product = createProduct(createNewProductDto(), expectedProductDto.getUuid());
-        product.setPrice(10d);
+        product.setPrice(BigDecimal.valueOf(10));
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class,

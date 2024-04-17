@@ -8,13 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Slf4j
 public class SimpleProductPriceScheduler {
 
     @Autowired
     private ProductRepository productRepository;
     @Value("${app.scheduling.priceIncrease}")
-    private Double priceIncrease;
+    private BigDecimal priceIncrease;
 
 
     @Scheduled(fixedDelayString = "${app.scheduling.period}")
@@ -22,7 +24,7 @@ public class SimpleProductPriceScheduler {
     @TimeTrack
     public void scheduleFixedDelayTask() {
         log.info("Start simple scheduler");
-        productRepository.findAll().forEach(p -> p.setPrice(p.getPrice() + priceIncrease));
+        productRepository.findAll().forEach(p -> p.setPrice(p.getPrice().add(priceIncrease)));
         log.info("End simple scheduler");
     }
 }

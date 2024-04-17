@@ -11,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ import java.util.UUID;
 
 @Slf4j
 public class OptimizedProductPriceScheduler {
-    @Value("${app.scheduling.priceIncrease}")
-    private Double priceIncrease;
+    @Value("#{new java.math.BigDecimal(\"${app.scheduling.priceIncrease}\")}")
+    private BigDecimal priceIncrease;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -71,7 +72,7 @@ public class OptimizedProductPriceScheduler {
     }
 
     private int[] updatePrices(Connection conn, List<UUID> uuids) throws SQLException {
-        String updateSQL = "UPDATE product SET price = price + 10 WHERE uuid = ?";
+        String updateSQL = "UPDATE product SET price = price + (price / 100) * " + priceIncrease + " WHERE uuid = ?";
         try (PreparedStatement statement = conn.prepareStatement(updateSQL)) {
             for (UUID uuid : uuids) {
                 statement.setObject(1, uuid);
