@@ -1,13 +1,12 @@
 package com.warehouse.myshop.product.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.ProductTestBase;
-import com.warehouse.myshop.product.dto.ListProductDto;
-import com.warehouse.myshop.product.dto.NewProductDto;
-import com.warehouse.myshop.product.dto.ResponseProductDto;
-import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.*;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
@@ -45,6 +44,7 @@ class ProductServiceImplTest extends ProductTestBase {
     private ProductMapper mapper;
     private static Category category;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
     @BeforeAll
     public static void createCategory() {
         category = new Category();
@@ -197,4 +197,16 @@ class ProductServiceImplTest extends ProductTestBase {
         assertEquals(expectedProducts.getProducts(), actualProducts.getProducts());
         verify(productRepository, times(1)).findAll(pageable);
     }
+
+    @Test
+    void Test() throws JsonProcessingException {
+        String str = "{" +
+                "        \"field\": \"price\"," +
+                "        \"value\": 110.0," +
+                "    }";
+        FilterConditionDto.NumericFilterConditionDto dto = objectMapper.readerFor(FilterConditionDto.
+                NumericFilterConditionDto.class).readValue(str);
+        System.out.println(dto);
+    }
+
 }
