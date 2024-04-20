@@ -1,9 +1,6 @@
 package com.warehouse.myshop.product.controller;
 
-import com.warehouse.myshop.product.dto.ListProductDto;
-import com.warehouse.myshop.product.dto.NewProductDto;
-import com.warehouse.myshop.product.dto.ResponseProductDto;
-import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.*;
 import com.warehouse.myshop.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -68,5 +66,12 @@ public class ProductController {
                                                       @RequestParam(defaultValue = "10") @Min(10) Integer size) {
         log.info("Получение страницы с товарами с form={} и size={}", from, size);
         return ResponseEntity.ok(productService.getProducts(PageRequest.of(from / size, size)));
+    }
+
+    //TODO Это тестовая версия эндпоинта, ее необходимо будет переделать
+    @GetMapping("search")
+    public List<FilterConditionDto<?>> searchProducts(@RequestBody List<FilterConditionDto<?>> conditions) {
+        System.out.println();
+        return conditions;
     }
 }
