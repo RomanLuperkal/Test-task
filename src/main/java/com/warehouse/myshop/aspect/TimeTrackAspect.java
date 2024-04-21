@@ -26,7 +26,7 @@ public class TimeTrackAspect {
              Instant end = Instant.now();
              Duration duration = Duration.between(start, end);
              long minutes = duration.toMinutes();
-             long seconds = duration.getSeconds() % 60;
+             long seconds = duration.getSeconds();
              log.info("Время выполнения метода " + method + " класса " + className + ": "+ minutes + "мин "
                      + seconds + "сек");
          }

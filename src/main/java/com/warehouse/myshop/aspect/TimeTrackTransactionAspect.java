@@ -16,7 +16,8 @@ import java.time.Instant;
 @Order(1)
 @Slf4j
 public class TimeTrackTransactionAspect {
-    @Around("@annotation(com.warehouse.myshop.anotation.TimeTrack) && @annotation(org.springframework.transaction.annotation.Transactional)")
+    @Around("@annotation(com.warehouse.myshop.anotation.TimeTrack) " +
+            "&& @annotation(org.springframework.transaction.annotation.Transactional)")
     public Object timeTrack(ProceedingJoinPoint joinPoint) throws Throwable {
         final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         final String className = methodSignature.getDeclaringType().getSimpleName();
@@ -28,7 +29,7 @@ public class TimeTrackTransactionAspect {
             Instant end = Instant.now();
             Duration duration = Duration.between(start, end);
             long minutes = duration.toMinutes();
-            long seconds = duration.getSeconds() % 60;
+            long seconds = duration.getSeconds();
             log.info("Время выполнения метода " + method + " класса " + className + "c учетом transactional: "
                     + minutes + "мин " + seconds + "сек");
         }
