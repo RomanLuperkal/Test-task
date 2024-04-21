@@ -93,7 +93,8 @@ public class OptimizedProductPriceScheduler {
         try (PreparedStatement statement = connection.prepareCall("SELECT count(*) FROM product")) {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return Math.round(resultSet.getInt(1) * 0.1);
+                final int countPage = resultSet.getInt(1);
+                return countPage < 10 ? 1 : Math.round(countPage * 0.1);
             }
             return 1;
         }
