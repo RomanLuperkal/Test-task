@@ -29,7 +29,7 @@ public class TimeTrackTransactionAspect {
             Instant end = Instant.now();
             Duration duration = Duration.between(start, end);
             long minutes = duration.toMinutes();
-            long seconds = duration.getSeconds();
+            long seconds = duration.getSeconds() % 60;
             log.info("Время выполнения метода " + method + " класса " + className + "c учетом transactional: "
                     + minutes + "мин " + seconds + "сек");
         }
