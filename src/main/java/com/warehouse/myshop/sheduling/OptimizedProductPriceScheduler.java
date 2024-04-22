@@ -58,7 +58,8 @@ public class OptimizedProductPriceScheduler {
 
                     connection.commit();
                     saveToFile(connection);
-                } catch (SQLException e) {
+                } catch (Exception e) {
+                    connection.rollback();
                     e.printStackTrace();
                 }
             });
