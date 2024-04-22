@@ -16,8 +16,7 @@ import java.time.Instant;
 @Order(1)
 @Slf4j
 public class TimeTrackTransactionAspect {
-    @Around("@annotation(com.warehouse.myshop.anotation.TimeTrack) " +
-            "&& @annotation(org.springframework.transaction.annotation.Transactional)")
+    @Around("@annotation(org.springframework.transaction.annotation.Transactional)")
     public Object timeTrack(ProceedingJoinPoint joinPoint) throws Throwable {
         final MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         final String className = methodSignature.getDeclaringType().getSimpleName();

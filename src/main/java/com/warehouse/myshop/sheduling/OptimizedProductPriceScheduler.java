@@ -33,34 +33,36 @@ public class OptimizedProductPriceScheduler {
     public void scheduleFixedDelayTask() {
         log.info("Start optimized scheduler");
         Session session = entityManager.unwrap(Session.class);
-        session.doWork(connection -> {
-            long offset = 0L;
-            long updatedRows = 0L;
-            long pageSize = calculatePageSize(connection);
+        try (session) {
+            session.doWork(connection -> {
+                long offset = 0L;
+                long updatedRows = 0L;
+                long pageSize = 100000;
 
-            try {
-                connection.setAutoCommit(false);
-                if (isLock)
-                    lockTable(connection);
+                try {
+                    connection.setAutoCommit(false);
+                    if (isLock)
+                        lockTable(connection);
 
-                while (true) {
-                    List<UUID> batch = fetchUuids(connection, pageSize, offset);
-                    if (batch.isEmpty()) {
-                        break;
+                    while (true) {
+                        List<UUID> batch = fetchUuids(connection, pageSize, offset);
+                        if (batch.isEmpty()) {
+                            break;
+                        }
+
+                        updatedRows += updatePrices(connection, batch).length;
+
+                        offset += pageSize;
+                        System.out.println("Обновлено " + updatedRows + " строк");
                     }
 
-                    updatedRows += updatePrices(connection, batch).length;
-
-                    offset += pageSize;
-                    System.out.println("Обновлено " + updatedRows + " строк");
+                    connection.commit();
+                    saveToFile(connection);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-
-                connection.commit();
-                saveToFile(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+            });
+        }
         log.info("End optimized scheduler");
     }
 
@@ -86,17 +88,6 @@ public class OptimizedProductPriceScheduler {
                 statement.addBatch();
             }
             return statement.executeBatch();
-        }
-    }
-
-    private long calculatePageSize(Connection connection) throws SQLException {
-        try (PreparedStatement statement = connection.prepareCall("SELECT count(*) FROM product")) {
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                final int countPage = resultSet.getInt(1);
-                return countPage < 10 ? 1 : Math.round(countPage * 0.1);
-            }
-            return 1;
         }
     }
 

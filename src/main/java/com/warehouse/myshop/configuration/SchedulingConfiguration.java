@@ -18,12 +18,11 @@ public class SchedulingConfiguration {
     public OptimizedProductPriceScheduler getOptimizedScheduler() {
         return new OptimizedProductPriceScheduler();
     }
+
     @Bean
     @Profile("default")
     @ConditionalOnExpression("${app.scheduling.enabled} && !${app.scheduling.optimization}")
     public SimpleProductPriceScheduler getSimpleScheduler() {
         return new SimpleProductPriceScheduler();
     }
-
-
 }
