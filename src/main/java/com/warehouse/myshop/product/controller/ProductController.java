@@ -1,6 +1,7 @@
 package com.warehouse.myshop.product.controller;
 
 import com.warehouse.myshop.product.dto.*;
+import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,8 +71,7 @@ public class ProductController {
 
     //TODO Это тестовая версия эндпоинта, ее необходимо будет переделать
     @GetMapping("search")
-    public List<FilterConditionDto<?>> searchProducts(@RequestBody List<FilterConditionDto<?>> conditions) {
-        System.out.println();
-        return conditions;
+    public List<Product> searchProducts(@RequestBody List<FilterConditionDto<?>> conditions) {
+        return productService.searchProducts(conditions);
     }
 }

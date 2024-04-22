@@ -2,22 +2,19 @@ package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
-import com.warehouse.myshop.category.service.CategoryService;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
-import com.warehouse.myshop.product.dto.ListProductDto;
-import com.warehouse.myshop.product.dto.NewProductDto;
-import com.warehouse.myshop.product.dto.ResponseProductDto;
-import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.*;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         product.setCategory(category);
-        product.getProductAudit().setLastUpdate(LocalDateTime.now());
+        //product.getProductAudit().setLastUpdate(LocalDateTime.now());
         return mapper.mapToResponseProductDto(mapper.mapToProduct(product, productDto));
     }
 
@@ -69,5 +66,14 @@ public class ProductServiceImpl implements ProductService {
         return ListProductDto.builder()
                 .products(mapper.mapToListResponseProductDto(productRepository.findAll(pageable)))
                 .build();
+    }
+
+    @Override
+    public List<Product> searchProducts(List<FilterConditionDto<?>> conditions) {
+        List<Specification<Product>> specifications = mapper.mapToListSpecification(conditions);
+        Specification<Product> resultSpecification = specifications.stream().reduce(Specification::and)
+                .orElse(Specification.where(null));
+        return productRepository.findAll(resultSpecification);
+
     }
 }
