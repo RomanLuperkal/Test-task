@@ -12,10 +12,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Slf4j
 public class OptimizedProductPriceScheduler {
@@ -23,10 +23,11 @@ public class OptimizedProductPriceScheduler {
     private BigDecimal priceIncrease;
     @Value("${app.scheduling.exclusive-lock}")
     private Boolean isLock;
+    private final String QUERY = "UPDATE product SET price = price * (1 + ? /100) RETURNING *";
 
     @PersistenceContext
     private EntityManager entityManager;
-    final String filePath = "src/main/resources/updatedProducts.txt";
+    final String filePath = "src/main/java/com/warehouse/myshop/file/updatedProducts.txt";
 
     @Scheduled(fixedDelayString = "${app.scheduling.period}")
     @TimeTrack
@@ -35,29 +36,20 @@ public class OptimizedProductPriceScheduler {
         Session session = entityManager.unwrap(Session.class);
         try (session) {
             session.doWork(connection -> {
-                long offset = 0L;
-                long updatedRows = 0L;
-                long pageSize = 100000;
-
                 try {
                     connection.setAutoCommit(false);
                     if (isLock)
                         lockTable(connection);
 
-                    while (true) {
-                        List<UUID> batch = fetchUuids(connection, pageSize, offset);
-                        if (batch.isEmpty()) {
-                            break;
-                        }
+                    final PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+                    preparedStatement.setBigDecimal(1, priceIncrease);
 
-                        updatedRows += updatePrices(connection, batch).length;
-
-                        offset += pageSize;
-                        System.out.println("Обновлено " + updatedRows + " строк");
+                    final ResultSet resultSet = preparedStatement.executeQuery();
+                    while (resultSet.next()) {
+                        saveToFile(resultSet);
                     }
-
                     connection.commit();
-                    saveToFile(connection);
+
                 } catch (Exception e) {
                     connection.rollback();
                     e.printStackTrace();
@@ -67,44 +59,16 @@ public class OptimizedProductPriceScheduler {
         log.info("End optimized scheduler");
     }
 
-    private List<UUID> fetchUuids(Connection conn, long pageSize, long offset) throws SQLException {
-        List<UUID> uuids = new ArrayList<>();
-        String sql = "SELECT uuid FROM product ORDER BY uuid LIMIT ? OFFSET ?";
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setLong(1, pageSize);
-            statement.setLong(2, offset);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                uuids.add(UUID.fromString(rs.getString("uuid")));
-            }
-        }
-        return uuids;
-    }
-
-    private int[] updatePrices(Connection conn, List<UUID> uuids) throws SQLException {
-        String updateSQL = "UPDATE product SET price = price + (price / 100) * " + priceIncrease + " WHERE uuid = ?";
-        try (PreparedStatement statement = conn.prepareStatement(updateSQL)) {
-            for (UUID uuid : uuids) {
-                statement.setObject(1, uuid);
-                statement.addBatch();
-            }
-            return statement.executeBatch();
-        }
-    }
-
-    private void saveToFile(Connection connection) throws SQLException {
+    private void saveToFile(ResultSet rs) throws SQLException {
         File file = new File(filePath);
-        ResultSet rs;
         final String productFields = "uuid, name, article_number, description, " +
                 "category_id, price, quantity, last_update, creation_date\n";
         final String format = "%s, %s, %s, %s, %d, %.2f, %d, %s, %s\n";
 
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM product");
-             FileWriter writer = new FileWriter(file, true)){
+        try (FileWriter writer = new FileWriter(file, true)) {
             if (file.length() == 0) {
                 writer.write(productFields);
             }
-            rs = statement.executeQuery();
             while (rs.next()) {
                 writer.write(String.format(format, rs.getObject("uuid"),
                         rs.getString("name"),
@@ -120,7 +84,7 @@ public class OptimizedProductPriceScheduler {
 
     private void lockTable(Connection connection) throws SQLException {
         String lockTableQuery = "LOCK TABLE product IN ACCESS EXCLUSIVE MODE";
-        try (PreparedStatement statement = connection.prepareStatement(lockTableQuery)){
+        try (PreparedStatement statement = connection.prepareStatement(lockTableQuery)) {
             statement.execute();
         }
     }
