@@ -1,5 +1,7 @@
 package com.warehouse.myshop.product.enums;
 
+import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,11 +34,11 @@ public enum Operation {
 
     public static Operation fromString(String text) {
         if (text == null) {
-            throw new IllegalArgumentException("Text cannot be null");
+            throw new InvalidOperationException("Operation не может быть null");
         }
         Operation operation = ALIASES_MAP.get(text.toUpperCase());
         if (operation == null) {
-            throw new IllegalArgumentException("No constant with text " + text + " found");
+            throw new InvalidOperationException("Не найдено константы с текстом: " + text);
         }
         return operation;
     }

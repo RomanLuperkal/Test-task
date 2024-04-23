@@ -12,7 +12,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "field", visible = true)
@@ -26,7 +29,9 @@ import java.time.LocalDateTime;
 @Getter
 public abstract class FilterConditionDto<T> {
 
+    @NotBlank
     protected String field;
+    @NotNull
     protected T value;
     protected Operation operation;
 
@@ -64,11 +69,11 @@ public abstract class FilterConditionDto<T> {
             switch (this.operation) {
                 case EQUALS:
                 case LIKE:
-                    return (root, query, cb) -> cb.equal(root.get("productAudit").get(this.field), this.value.toLocalDate());
+                    return (root, query, cb) -> cb.equal(root.get("productAudit").get(this.field).as(LocalDate.class), this.value.toLocalDate());
                 case GREATER_THAN_OR_EQUALS:
-                    return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("productAudit").get(this.field), this.value.toLocalDate());
+                    return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("productAudit").get(this.field), this.value);
                 case LESS_THAN_OR_EQUALS:
-                    return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("productAudit").get(this.field), this.value.toLocalDate());
+                    return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("productAudit").get(this.field), this.value);
                 default: return null;
             }
         }

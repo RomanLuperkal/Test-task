@@ -69,11 +69,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> searchProducts(List<FilterConditionDto<?>> conditions) {
+    public ListProductDto searchProducts(List<FilterConditionDto<?>> conditions, Pageable pageable) {
         List<Specification<Product>> specifications = mapper.mapToListSpecification(conditions);
         Specification<Product> resultSpecification = specifications.stream().reduce(Specification::and)
                 .orElse(Specification.where(null));
-        return productRepository.findAll(resultSpecification);
-
+        List<ResponseProductDto> products = mapper
+                .mapToListResponseProductDto(productRepository.findAll(resultSpecification, pageable));
+        return ListProductDto
+                .builder()
+                .products(products)
+                .build();
     }
 }

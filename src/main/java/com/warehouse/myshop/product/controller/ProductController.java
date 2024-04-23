@@ -1,7 +1,6 @@
 package com.warehouse.myshop.product.controller;
 
 import com.warehouse.myshop.product.dto.*;
-import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -69,9 +69,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProducts(PageRequest.of(from / size, size)));
     }
 
-    //TODO Это тестовая версия эндпоинта, ее необходимо будет переделать
     @GetMapping("search")
-    public List<Product> searchProducts(@RequestBody List<FilterConditionDto<?>> conditions) {
-        return productService.searchProducts(conditions);
+    public ResponseEntity<ListProductDto> searchProducts(@RequestBody @Valid List<FilterConditionDto<?>> conditions,
+                                                         Pageable pageable) {
+        return ResponseEntity.ok(productService.searchProducts(conditions, pageable));
     }
 }

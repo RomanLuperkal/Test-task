@@ -1,7 +1,6 @@
 package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.product.dto.*;
-import com.warehouse.myshop.product.model.Product;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -18,5 +17,5 @@ public interface ProductService {
 
     ListProductDto getProducts(Pageable pageable);
 
-    List<Product> searchProducts(List<FilterConditionDto<?>> conditions);
+    ListProductDto searchProducts(List<FilterConditionDto<?>> conditions, Pageable pageable);
 }
