@@ -6,12 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Operation {
-    EQUALS("=", new String[]{"EQUALS", "="}),
-    GREATER_THAN_OR_EQUALS(">=", new String[]{"GREATER_THAN_OR_EQUALS", ">="}),
-    LESS_THAN_OR_EQUALS("<=", new String[]{"LESS_THAN_OR_EQUALS", "<="}),
-    LIKE("~", new String[]{"LIKE", "~"});
-
-    private final String symbol;
+    EQUALS(new String[]{"EQUALS", "="}),
+    GREATER_THAN_OR_EQUALS(new String[]{"GREATER_THAN_OR_EQUALS", ">="}),
+    LESS_THAN_OR_EQUALS(new String[]{"LESS_THAN_OR_EQUALS", "<="}),
+    LIKE(new String[]{"LIKE", "~"});
     private final String[] aliases;
     private static final Map<String, Operation> ALIASES_MAP = new HashMap<>();
 
@@ -23,13 +21,8 @@ public enum Operation {
         }
     }
 
-    Operation(String symbol, String[] aliases) {
-        this.symbol = symbol;
+    Operation(String[] aliases) {
         this.aliases = aliases;
-    }
-
-    public String getSymbol() {
-        return symbol;
     }
 
     public static Operation fromString(String text) {
