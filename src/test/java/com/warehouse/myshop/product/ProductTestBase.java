@@ -101,6 +101,30 @@ public abstract class ProductTestBase {
         nameCondition.setValue("test_name4");
         nameCondition.setOperation("EQUALS");
 
-        return List.of(priceCondition, creationDateCondition, nameCondition);
+        return List.of(getDefaultNumericFilterConditionDto(), getDateFilterConditionDto(), getDefaultStringFilterCondition());
+    }
+
+    protected NumericFilterConditionDto getDefaultNumericFilterConditionDto() {
+        NumericFilterConditionDto priceCondition = new NumericFilterConditionDto();
+        priceCondition.setField("price");
+        priceCondition.setValue(BigDecimal.valueOf(100));
+        priceCondition.setOperation("=");
+        return priceCondition;
+    }
+
+    protected DateFilterConditionDto getDateFilterConditionDto() {
+        DateFilterConditionDto creationDateCondition = new DateFilterConditionDto();
+        creationDateCondition.setField("creationDate");
+        creationDateCondition.setValue(LocalDateTime.of(2025, 4, 22, 0, 0));
+        creationDateCondition.setOperation(">=");
+        return creationDateCondition;
+    }
+
+    protected StringFilterCondition getDefaultStringFilterCondition() {
+        StringFilterCondition nameCondition = new StringFilterCondition();
+        nameCondition.setField("name");
+        nameCondition.setValue("test_name4");
+        nameCondition.setOperation("EQUALS");
+        return nameCondition;
     }
 }
