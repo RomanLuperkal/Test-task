@@ -2,6 +2,8 @@ package com.warehouse.myshop.product;
 
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.product.audit.ProductAudit;
+import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.FilterConditionDto.*;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
@@ -9,7 +11,9 @@ import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class ProductTestBase {
@@ -79,5 +83,24 @@ public abstract class ProductTestBase {
         Product product = mapper.mapToProduct(productDto);
         product.setUuid(uuid);
         return product;
+    }
+
+    protected List<FilterConditionDto<?>> getDefaultConditions() {
+        NumericFilterConditionDto priceCondition = new NumericFilterConditionDto();
+        priceCondition.setField("price");
+        priceCondition.setValue(BigDecimal.valueOf(100));
+        priceCondition.setOperation("=");
+
+        DateFilterConditionDto creationDateCondition = new DateFilterConditionDto();
+        creationDateCondition.setField("creationDate");
+        creationDateCondition.setValue(LocalDateTime.of(2025, 4, 22, 10, 2, 54));
+        creationDateCondition.setOperation(">=");
+
+        StringFilterCondition nameCondition = new StringFilterCondition();
+        nameCondition.setField("name");
+        nameCondition.setValue("test_name4");
+        nameCondition.setOperation("EQUALS");
+
+        return List.of(priceCondition, creationDateCondition, nameCondition);
     }
 }
