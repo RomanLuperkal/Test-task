@@ -13,14 +13,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class SchedulingConfiguration {
 
     @Bean
-    @Profile("default")
+    @Profile("!local")
     @ConditionalOnExpression("${app.scheduling.enabled} && ${app.scheduling.optimization}")
     public OptimizedProductPriceScheduler getOptimizedScheduler() {
         return new OptimizedProductPriceScheduler();
     }
 
     @Bean
-    @Profile("default")
+    @Profile("!local")
     @ConditionalOnExpression("${app.scheduling.enabled} && !${app.scheduling.optimization}")
     public SimpleProductPriceScheduler getSimpleScheduler() {
         return new SimpleProductPriceScheduler();
