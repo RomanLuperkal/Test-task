@@ -47,7 +47,7 @@ public class ProductServiceImplJpaTest extends ProductTestBase {
         NumericFilterConditionDto numericFilterConditionDto = getDefaultNumericFilterConditionDto();
         numericFilterConditionDto.setOperation(operation);
         conditions = List.of(numericFilterConditionDto);
-        Double exceptedPrice = 100d;
+        BigDecimal exceptedPrice = new BigDecimal("100.00");
         int exceptedSize = 1;
 
 
@@ -65,7 +65,7 @@ public class ProductServiceImplJpaTest extends ProductTestBase {
         numericFilterConditionDto.setOperation(operation);
         numericFilterConditionDto.setValue(BigDecimal.valueOf(300));
         conditions = List.of(numericFilterConditionDto);
-        List<Double> exceptedPrices = List.of(300d, 400d);
+        List<BigDecimal> exceptedPrices = List.of(new BigDecimal("300.00"), new BigDecimal("400.00"));
         final int exceptedSize = 2;
 
 
@@ -84,7 +84,7 @@ public class ProductServiceImplJpaTest extends ProductTestBase {
         numericFilterConditionDto.setOperation(operation);
         numericFilterConditionDto.setValue(BigDecimal.valueOf(200));
         conditions = List.of(numericFilterConditionDto);
-        List<Double> exceptedPrices = List.of(200d, 100d);
+        List<BigDecimal> exceptedPrices = List.of(new BigDecimal("200.00"), new BigDecimal("100.00"));
         int exceptedSize = 2;
 
 
