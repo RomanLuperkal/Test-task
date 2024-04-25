@@ -14,3 +14,12 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
+
+app:
+  scheduling:
+    enabled: true
+    period: 5000
+    priceIncrease: 10.1
+    optimization: true
+    exclusive-lock: false
+

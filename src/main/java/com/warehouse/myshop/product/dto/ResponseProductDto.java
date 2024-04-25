@@ -4,6 +4,7 @@ import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.product.audit.ProductAudit;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class ResponseProductDto {
     private String articleNumber;
     private String description;
     private CategoryDtoResp category;
-    private Double price;
+    private BigDecimal price;
     private Integer quantity;
     private ProductAudit productAudit;
 

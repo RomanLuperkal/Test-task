@@ -63,7 +63,7 @@ public abstract class ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(5)
                 .build();
     }
@@ -74,7 +74,7 @@ public abstract class ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(10)
                 .build();
     }

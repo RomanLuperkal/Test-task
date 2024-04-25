@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class ProductControllerTest extends ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(10)
                 .build();
 
@@ -76,7 +77,7 @@ public class ProductControllerTest extends ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(5)
                 .build();
         listProductDto = ListProductDto.builder()
@@ -117,7 +118,7 @@ public class ProductControllerTest extends ProductTestBase {
                 .name("  test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(-10)
                 .build();
         mockMvc.perform(post(url)
@@ -150,7 +151,7 @@ public class ProductControllerTest extends ProductTestBase {
                 .name("  test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(-10)
                 .build();
         mockMvc.perform(patch(url+ "/" + UUID.randomUUID())

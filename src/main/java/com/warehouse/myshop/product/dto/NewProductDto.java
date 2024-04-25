@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 
 @Builder
 @Setter
@@ -22,7 +23,7 @@ public class NewProductDto {
     @Positive(message = "Некоректный индификатор категории")
     private Long categoryId;
     @Positive(message = "Недопустимая стоимость товара")
-    private Double price;
+    private BigDecimal price;
     @PositiveOrZero(message = "Количество товара не может быть отрицательным")
     private Integer quantity;
 }
