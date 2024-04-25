@@ -1,5 +1,6 @@
 package com.warehouse.myshop.configuration;
 
+import com.warehouse.myshop.product.repository.ProductRepository;
 import com.warehouse.myshop.sheduling.OptimizedProductPriceScheduler;
 import com.warehouse.myshop.sheduling.SimpleProductPriceScheduler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -22,7 +23,7 @@ public class SchedulingConfiguration {
     @Bean
     @Profile("!local")
     @ConditionalOnExpression("${app.scheduling.enabled} && !${app.scheduling.optimization}")
-    public SimpleProductPriceScheduler getSimpleScheduler() {
-        return new SimpleProductPriceScheduler();
+    public SimpleProductPriceScheduler getSimpleScheduler(ProductRepository productRepository) {
+        return new SimpleProductPriceScheduler(productRepository);
     }
 }
