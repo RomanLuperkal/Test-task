@@ -3,6 +3,7 @@ package com.warehouse.myshop.product.dto;
 import lombok.*;
 
 import javax.validation.constraints.*;
+import java.math.BigDecimal;
 
 @Builder
 @Setter
@@ -19,7 +20,7 @@ public class UpdateProductDto {
     @Positive(message = "Некоректный индификатор категории")
     private Long categoryId;
     @Positive(message = "Недопустимая стоимость товара")
-    private Double price;
+    private BigDecimal price;
     @PositiveOrZero(message = "Количество товара не может быть отрицательным")
     private Integer quantity;
 }

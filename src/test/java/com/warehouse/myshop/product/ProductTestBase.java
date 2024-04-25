@@ -9,6 +9,7 @@ import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -59,7 +60,7 @@ public abstract class ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(5)
                 .build();
     }
@@ -70,7 +71,7 @@ public abstract class ProductTestBase {
                 .name("test")
                 .articleNumber("te-st-article")
                 .description("test description")
-                .price(50.5)
+                .price(BigDecimal.valueOf(50.5))
                 .quantity(10)
                 .build();
     }
