@@ -2,7 +2,6 @@ package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
-import com.warehouse.myshop.category.service.CategoryService;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -11,6 +10,7 @@ import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
+import com.warehouse.myshop.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +25,7 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
 
     @Override
@@ -61,7 +62,9 @@ public class ProductServiceImpl implements ProductService {
     public ResponseProductDto getProduct(UUID uuid) {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
-        return mapper.mapToResponseProductDto(product);
+        ResponseProductDto responseProductDto = mapper.mapToResponseProductDto(product);
+        responseProductDto.setCurrency(currencyProvider.getCurrency());
+        return responseProductDto;
     }
 
     @Override
