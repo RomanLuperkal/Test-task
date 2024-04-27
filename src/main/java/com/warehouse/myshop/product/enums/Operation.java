@@ -2,37 +2,27 @@ package com.warehouse.myshop.product.enums;
 
 import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum Operation {
-    EQUALS(new String[]{"EQUALS", "="}),
-    GREATER_THAN_OR_EQUALS(new String[]{"GREATER_THAN_OR_EQUALS", ">="}),
-    LESS_THAN_OR_EQUALS(new String[]{"LESS_THAN_OR_EQUALS", "<="}),
-    LIKE(new String[]{"LIKE", "~"});
-    private final String[] aliases;
-    private static final Map<String, Operation> ALIASES_MAP = new HashMap<>();
+    EQUALS("="),
+    GREATER_THAN_OR_EQUALS(">="),
+    LESS_THAN_OR_EQUALS("<="),
+    LIKE("~");
 
-    static {
-        for (Operation op : Operation.values()) {
-            for (String alias : op.aliases) {
-                ALIASES_MAP.put(alias, op);
-            }
-        }
-    }
+    private final String code;
 
-    Operation(String[] aliases) {
-        this.aliases = aliases;
+    Operation(String code) {
+        this.code = code;
     }
 
     public static Operation fromString(String text) {
         if (text == null) {
             throw new InvalidOperationException("Operation не может быть null");
         }
-        Operation operation = ALIASES_MAP.get(text.toUpperCase());
-        if (operation == null) {
-            throw new InvalidOperationException("Не найдено константы с текстом: " + text);
+        for (Operation operationType : Operation.values()) {
+            if (operationType.name().equals(text) || operationType.code.equals(text)) {
+                return operationType;
+            }
         }
-        return operation;
+        throw new InvalidOperationException("Не найдено константы с текстом: " + text);
     }
 }

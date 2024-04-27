@@ -2,18 +2,18 @@ package com.warehouse.myshop.product;
 
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.product.audit.ProductAudit;
-import com.warehouse.myshop.product.dto.FilterConditionDto;
-import com.warehouse.myshop.product.dto.FilterConditionDto.*;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.condition.DateFilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.NumericFilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.StringFilterCondition;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class ProductTestBase {
@@ -85,46 +85,17 @@ public abstract class ProductTestBase {
         return product;
     }
 
-    protected List<FilterConditionDto<?>> getDefaultConditions() {
-        NumericFilterConditionDto priceCondition = new NumericFilterConditionDto();
-        priceCondition.setField("price");
-        priceCondition.setValue(BigDecimal.valueOf(100));
-        priceCondition.setOperation("=");
 
-        DateFilterConditionDto creationDateCondition = new DateFilterConditionDto();
-        creationDateCondition.setField("creationDate");
-        creationDateCondition.setValue(LocalDateTime.of(2025, 4, 22, 10, 2, 54));
-        creationDateCondition.setOperation(">=");
-
-        StringFilterCondition nameCondition = new StringFilterCondition();
-        nameCondition.setField("name");
-        nameCondition.setValue("test_name4");
-        nameCondition.setOperation("EQUALS");
-
-        return List.of(getDefaultNumericFilterConditionDto(), getDateFilterConditionDto(), getDefaultStringFilterCondition());
+    protected NumericFilterConditionDto getDefaultNumericFilterConditionDto(String field, String value, String operation) {
+        return new NumericFilterConditionDto(field, new BigDecimal(value), operation);
     }
 
-    protected NumericFilterConditionDto getDefaultNumericFilterConditionDto() {
-        NumericFilterConditionDto priceCondition = new NumericFilterConditionDto();
-        priceCondition.setField("price");
-        priceCondition.setValue(BigDecimal.valueOf(100));
-        priceCondition.setOperation("=");
-        return priceCondition;
+    protected DateFilterConditionDto getDateFilterConditionDto(String field, LocalDateTime value, String operation) {
+        return new DateFilterConditionDto(field,
+                value, operation);
     }
 
-    protected DateFilterConditionDto getDateFilterConditionDto() {
-        DateFilterConditionDto creationDateCondition = new DateFilterConditionDto();
-        creationDateCondition.setField("creationDate");
-        creationDateCondition.setValue(LocalDateTime.of(2025, 4, 22, 0, 0));
-        creationDateCondition.setOperation(">=");
-        return creationDateCondition;
-    }
-
-    protected StringFilterCondition getDefaultStringFilterCondition() {
-        StringFilterCondition nameCondition = new StringFilterCondition();
-        nameCondition.setField("name");
-        nameCondition.setValue("test_name4");
-        nameCondition.setOperation("EQUALS");
-        return nameCondition;
+    protected StringFilterCondition getDefaultStringFilterCondition(String field, String value, String operation) {
+        return new StringFilterCondition(field, value, operation);
     }
 }

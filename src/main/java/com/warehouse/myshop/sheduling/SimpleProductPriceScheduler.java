@@ -5,7 +5,6 @@ import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,7 @@ import java.math.RoundingMode;
 @RequiredArgsConstructor
 public class SimpleProductPriceScheduler {
 
-    final private ProductRepository productRepository;
+    private final ProductRepository productRepository;
     @Value("${app.scheduling.priceIncrease}")
     private BigDecimal priceIncrease;
 

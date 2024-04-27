@@ -17,7 +17,7 @@ spring:
 
 app:
   scheduling:
-    enabled: true
+    enabled: false
     period: 5000
     priceIncrease: 10.1
     optimization: true
