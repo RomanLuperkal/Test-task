@@ -2,6 +2,9 @@ package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
+import com.warehouse.myshop.currency.client.CurrencyServiceClient;
+import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -10,7 +13,6 @@ import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
-import com.warehouse.myshop.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
+    private final CurrencyServiceClient currencyClient;
 
     @Override
     @Transactional
@@ -63,7 +66,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         ResponseProductDto responseProductDto = mapper.mapToResponseProductDto(product);
-        responseProductDto.setCurrency(currencyProvider.getCurrency());
+        String currency = currencyProvider.getCurrency();
+        responseProductDto.setCurrency(currency);
+        if (!currency.equals("RUB")) {
+            ResponseCurrencyDto currenciesRate = currencyClient.getCurrency();
+            responseProductDto.setPrice(responseProductDto.getPrice().multiply(currenciesRate.getCurrencyFromString(currency)));
+        }
         return responseProductDto;
     }
 

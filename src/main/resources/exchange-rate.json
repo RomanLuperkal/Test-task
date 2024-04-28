@@ -1,5 +1,5 @@
 {
-  "exchangeRateCNY": 12.86,
-  "exchangeRateUSD": 98.5,
-  "exchangeRateEUR": 102.3
+  "USD": 98.5,
+  "EUR": 102.3,
+  "CNY": 12.86
 }

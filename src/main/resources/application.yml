@@ -17,9 +17,14 @@ spring:
 
 app:
   scheduling:
-    enabled: true
+    enabled: false
     period: 5000
     priceIncrease: 10.1
     optimization: true
     exclusive-lock: false
+
+currency-service:
+  host: http://localhost:8081
+  methods:
+    get-currency: /currency
 

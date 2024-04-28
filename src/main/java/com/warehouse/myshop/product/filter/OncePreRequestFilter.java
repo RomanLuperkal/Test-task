@@ -1,7 +1,7 @@
 package com.warehouse.myshop.product.filter;
 
 
-import com.warehouse.myshop.session.CurrencyProvider;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

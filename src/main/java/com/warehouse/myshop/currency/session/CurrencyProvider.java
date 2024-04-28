@@ -1,4 +1,4 @@
-package com.warehouse.myshop.session;
+package com.warehouse.myshop.currency.session;
 
 import lombok.Getter;
 import lombok.Setter;
