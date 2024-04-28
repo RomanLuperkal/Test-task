@@ -1,6 +1,10 @@
 package com.warehouse.myshop.product.controller;
 
-import com.warehouse.myshop.product.dto.*;
+import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.ListProductDto;
+import com.warehouse.myshop.product.dto.NewProductDto;
+import com.warehouse.myshop.product.dto.ResponseProductDto;
+import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +16,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -24,7 +37,7 @@ import java.util.UUID;
 @Slf4j
 @Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Tag(name="Product controller", description="Позволяет взаимодействовать с товарами")
+@Tag(name = "Product controller", description = "Позволяет взаимодействовать с товарами")
 public class ProductController {
     private final ProductService productService;
 
@@ -69,7 +82,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProducts(PageRequest.of(from / size, size)));
     }
 
-    @GetMapping("search")
+    @PostMapping("search")
     public ResponseEntity<ListProductDto> searchProducts(@RequestBody @Valid List<FilterConditionDto<?>> conditions,
                                                          Pageable pageable) {
         return ResponseEntity.ok(productService.searchProducts(conditions, pageable));

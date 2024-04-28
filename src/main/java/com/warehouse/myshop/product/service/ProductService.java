@@ -1,6 +1,11 @@
 package com.warehouse.myshop.product.service;
 
-import com.warehouse.myshop.product.dto.*;
+
+import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.ListProductDto;
+import com.warehouse.myshop.product.dto.NewProductDto;
+import com.warehouse.myshop.product.dto.ResponseProductDto;
+import com.warehouse.myshop.product.dto.UpdateProductDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

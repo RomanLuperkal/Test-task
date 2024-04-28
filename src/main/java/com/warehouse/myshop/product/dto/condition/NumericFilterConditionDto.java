@@ -23,7 +23,8 @@ public class NumericFilterConditionDto extends FilterConditionDto<BigDecimal> {
                 return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get(this.field), this.value);
             case LESS_THAN_OR_EQUALS:
                 return (root, query, cb) -> cb.lessThanOrEqualTo(root.get(this.field), this.value);
-            default: return null;
+            default:
+                return null;
         }
     }
 }

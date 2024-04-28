@@ -31,7 +31,8 @@ public class DateFilterConditionDto extends FilterConditionDto<LocalDateTime> {
                 return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("productAudit").get(this.field), this.value);
             case LESS_THAN_OR_EQUALS:
                 return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("productAudit").get(this.field), this.value);
-            default: return null;
+            default:
+                return null;
         }
     }
 }

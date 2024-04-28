@@ -40,13 +40,4 @@ public abstract class FilterConditionDto<T> {
     public abstract Specification<Product> getSpecification();
 
 
-   /* public void setOperation(String operation) {
-        this.operation = Operation.fromString(operation);
-    }*/
-
-
-
-
-
-
 }

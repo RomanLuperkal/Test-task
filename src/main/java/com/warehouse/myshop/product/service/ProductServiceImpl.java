@@ -3,7 +3,11 @@ package com.warehouse.myshop.product.service;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
-import com.warehouse.myshop.product.dto.*;
+import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.ListProductDto;
+import com.warehouse.myshop.product.dto.NewProductDto;
+import com.warehouse.myshop.product.dto.ResponseProductDto;
+import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
@@ -42,7 +46,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         product.setCategory(category);
-        //product.getProductAudit().setLastUpdate(LocalDateTime.now());
         return mapper.mapToResponseProductDto(mapper.mapToProduct(product, productDto));
     }
 

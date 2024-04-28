@@ -21,7 +21,8 @@ public class StringFilterCondition extends FilterConditionDto<String> {
                 return (root, query, cb) -> cb.like(root.get(this.field), this.value + "%");
             case LESS_THAN_OR_EQUALS:
                 return (root, query, cb) -> cb.like(root.get(this.field), "%" + this.value);
-            default:return null;
+            default:
+                return null;
         }
     }
 }
