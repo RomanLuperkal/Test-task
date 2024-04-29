@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.currency.client.CurrencyServiceClient;
@@ -19,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
     private final CurrencyServiceClient currencyClient;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -69,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
         String currency = currencyProvider.getCurrency();
         responseProductDto.setCurrency(currency);
         if (!currency.equals("RUB")) {
-            ResponseCurrencyDto currenciesRate = currencyClient.getCurrency();
+            ResponseCurrencyDto currenciesRate = getCurrenciesRate();
             responseProductDto.setPrice(responseProductDto.getPrice().multiply(currenciesRate.getCurrencyFromString(currency)));
         }
         return responseProductDto;
@@ -80,5 +85,27 @@ public class ProductServiceImpl implements ProductService {
         return ListProductDto.builder()
                 .products(mapper.mapToListResponseProductDto(productRepository.findAll(pageable)))
                 .build();
+    }
+
+    private String readJsonResource(String resourcePath) {
+        try {
+            Path path = Path.of("target/classes/" + resourcePath);
+            return Files.readString(path, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось прочитать json файл");
+        }
+    }
+
+    private ResponseCurrencyDto getCurrenciesRate() {
+        try {
+            return currencyClient.getCurrenciesRate();
+        } catch (Exception e) {
+            try {
+                System.out.println("Читаю данные из файла");
+                return objectMapper.readValue(readJsonResource("exchange-rate.json"), ResponseCurrencyDto.class);
+            } catch (Exception e2) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
