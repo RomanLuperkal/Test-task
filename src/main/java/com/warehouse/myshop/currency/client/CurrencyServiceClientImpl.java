@@ -4,6 +4,7 @@ import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
 import com.warehouse.myshop.handler.exceptions.ResponseStatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
+@ConditionalOnExpression("!${currency-service.mock}")
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
 
     private final WebClient webClient;

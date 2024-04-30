@@ -1,5 +1,6 @@
 package com.warehouse.myshop.currency.session;
 
+import com.warehouse.myshop.enums.Currency;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
@@ -12,5 +13,5 @@ import org.springframework.web.context.WebApplicationContext;
 @Setter
 @Component
 public class CurrencyProvider {
-    private String currency = "RUB";
+    private Currency currency = Currency.RUB;
 }

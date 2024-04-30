@@ -6,6 +6,7 @@ import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.currency.client.CurrencyServiceClient;
 import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
+import com.warehouse.myshop.enums.Currency;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -15,19 +16,24 @@ import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -71,19 +77,25 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         ResponseProductDto responseProductDto = mapper.mapToResponseProductDto(product);
-        String currency = currencyProvider.getCurrency();
-        responseProductDto.setCurrency(currency);
-        if (!currency.equals("RUB")) {
+        Currency currency = currencyProvider.getCurrency();
+        responseProductDto.setCurrency(currency.toString());
+        if (!currency.equals(Currency.RUB)) {
             ResponseCurrencyDto currenciesRate = getCurrenciesRate();
-            responseProductDto.setPrice(responseProductDto.getPrice().multiply(currenciesRate.getCurrencyFromString(currency)));
+            convertPrice(responseProductDto, currenciesRate.getCurrencyFromString(currency));
         }
         return responseProductDto;
     }
 
     @Override
     public ListProductDto getProducts(Pageable pageable) {
+        List<ResponseProductDto> responseProducts = mapper.mapToListResponseProductDto(productRepository.findAll(pageable));
+        Currency currency = currencyProvider.getCurrency();
+        if (!currency.equals(Currency.RUB)) {
+            ResponseCurrencyDto currenciesRate = getCurrenciesRate();
+            responseProducts.forEach(p -> convertPrice(p, currenciesRate.getCurrencyFromString(currency)));
+        }
         return ListProductDto.builder()
-                .products(mapper.mapToListResponseProductDto(productRepository.findAll(pageable)))
+                .products(responseProducts)
                 .build();
     }
 
@@ -101,11 +113,16 @@ public class ProductServiceImpl implements ProductService {
             return currencyClient.getCurrenciesRate();
         } catch (Exception e) {
             try {
-                System.out.println("Читаю данные из файла");
+                log.debug("Чтение курса валют из файла");
                 return objectMapper.readValue(readJsonResource("exchange-rate.json"), ResponseCurrencyDto.class);
             } catch (Exception e2) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
+        BigDecimal rubPrice = responseProduct.getPrice();
+        responseProduct.setPrice(rubPrice.divide(currency, 2, RoundingMode.HALF_UP));
     }
 }
