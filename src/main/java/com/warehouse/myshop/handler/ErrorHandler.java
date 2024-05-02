@@ -1,5 +1,6 @@
 package com.warehouse.myshop.handler;
 
+import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.responce.ApiError;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -71,5 +72,16 @@ public class ErrorHandler {
                 .time(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidOperationException.class)
+    private ResponseEntity<ApiError> handleException(InvalidOperationException e) {
+        ApiError errorResponse = ApiError.builder()
+                .message(e.getMessage())
+                .reason("Неподдерживаемая операция сравнения")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

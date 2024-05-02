@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;

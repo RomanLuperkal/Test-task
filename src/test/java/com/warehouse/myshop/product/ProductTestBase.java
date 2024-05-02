@@ -5,6 +5,9 @@ import com.warehouse.myshop.product.audit.ProductAudit;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.condition.DateFilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.NumericFilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.StringFilterCondition;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,5 +83,19 @@ public abstract class ProductTestBase {
         Product product = mapper.mapToProduct(productDto);
         product.setUuid(uuid);
         return product;
+    }
+
+
+    protected NumericFilterConditionDto getDefaultNumericFilterConditionDto(String field, String value, String operation) {
+        return new NumericFilterConditionDto(field, new BigDecimal(value), operation);
+    }
+
+    protected DateFilterConditionDto getDateFilterConditionDto(String field, LocalDateTime value, String operation) {
+        return new DateFilterConditionDto(field,
+                value, operation);
+    }
+
+    protected StringFilterCondition getDefaultStringFilterCondition(String field, String value, String operation) {
+        return new StringFilterCondition(field, value, operation);
     }
 }
