@@ -3,7 +3,6 @@ package com.warehouse.myshop.filter;
 
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.enums.Currency;
-import com.warehouse.myshop.handler.exceptions.CurrencyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -13,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -25,14 +25,12 @@ public class CurrencyFilter extends OncePerRequestFilter {
         String method = request.getMethod();
         if (uri.startsWith("/product") && method.equals("GET")) {
             String currency = request.getHeader("currency");
-            try {
-                if (currency != null) {
-                    currencyProvider.setCurrency(Currency.valueOf(currency));
-                }
-            } catch (Exception e) {
-                throw new CurrencyException(e.getMessage());
+            if (currency != null) {
+                Optional.ofNullable(currency)
+                        .map(Currency::getCurrency)
+                        .ifPresent(currencyProvider::setCurrency);
             }
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
     }
 }

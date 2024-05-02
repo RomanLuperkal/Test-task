@@ -1,10 +1,8 @@
 package com.warehouse.myshop.product.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
-import com.warehouse.myshop.currency.client.CurrencyServiceClient;
-import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
+import com.warehouse.myshop.currency.ExchangeRateProvider;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.enums.Currency;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
@@ -26,10 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,8 +35,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
-    private final CurrencyServiceClient currencyClient;
-    private final ObjectMapper objectMapper;
+    private final ExchangeRateProvider rateProvider;
 
     @Override
     @Transactional
@@ -81,8 +74,7 @@ public class ProductServiceImpl implements ProductService {
         Currency currency = currencyProvider.getCurrency();
         responseProductDto.setCurrency(currency.toString());
         if (!currency.equals(Currency.RUB)) {
-            ResponseCurrencyDto currenciesRate = getCurrenciesRate();
-            convertPrice(responseProductDto, currenciesRate.getCurrencyFromString(currency));
+            convertPrice(responseProductDto, rateProvider.getExchangeRate(currency));
         }
         return responseProductDto;
     }
@@ -92,8 +84,7 @@ public class ProductServiceImpl implements ProductService {
         List<ResponseProductDto> responseProducts = mapper.mapToListResponseProductDto(productRepository.findAll(pageable));
         Currency currency = currencyProvider.getCurrency();
         if (!currency.equals(Currency.RUB)) {
-            ResponseCurrencyDto currenciesRate = getCurrenciesRate();
-            responseProducts.forEach(p -> convertPrice(p, currenciesRate.getCurrencyFromString(currency)));
+            responseProducts.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
         }
         return ListProductDto.builder()
                 .products(responseProducts)
@@ -107,32 +98,14 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(Specification.where(null));
         List<ResponseProductDto> products = mapper
                 .mapToListResponseProductDto(productRepository.findAll(resultSpecification, pageable));
+        Currency currency = currencyProvider.getCurrency();
+        if (!currency.equals(Currency.RUB)) {
+            products.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
+        }
         return ListProductDto
                 .builder()
                 .products(products)
                 .build();
-    }
-
-    private String readJsonResource(String resourcePath) {
-        try {
-            Path path = Path.of("target/classes/" + resourcePath);
-            return Files.readString(path, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Не удалось прочитать json файл");
-        }
-    }
-
-    private ResponseCurrencyDto getCurrenciesRate() {
-        try {
-            return currencyClient.getCurrenciesRate();
-        } catch (Exception e) {
-            try {
-                log.debug("Чтение курса валют из файла");
-                return objectMapper.readValue(readJsonResource("exchange-rate.json"), ResponseCurrencyDto.class);
-            } catch (Exception e2) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
