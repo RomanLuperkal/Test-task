@@ -8,6 +8,7 @@ import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.enums.Currency;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
+import com.warehouse.myshop.product.dto.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +62,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         product.setCategory(category);
-        product.getProductAudit().setLastUpdate(LocalDateTime.now());
         return mapper.mapToResponseProductDto(mapper.mapToProduct(product, productDto));
     }
 
@@ -96,6 +97,19 @@ public class ProductServiceImpl implements ProductService {
         }
         return ListProductDto.builder()
                 .products(responseProducts)
+                .build();
+    }
+
+    @Override
+    public ListProductDto searchProducts(List<FilterConditionDto<?>> conditions, Pageable pageable) {
+        List<Specification<Product>> specifications = mapper.mapToListSpecification(conditions);
+        Specification<Product> resultSpecification = specifications.stream().reduce(Specification::and)
+                .orElse(Specification.where(null));
+        List<ResponseProductDto> products = mapper
+                .mapToListResponseProductDto(productRepository.findAll(resultSpecification, pageable));
+        return ListProductDto
+                .builder()
+                .products(products)
                 .build();
     }
 
