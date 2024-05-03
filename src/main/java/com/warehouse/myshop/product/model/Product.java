@@ -32,6 +32,8 @@ public class Product {
     private Integer quantity;
     @Embedded
     private ProductAudit productAudit = new ProductAudit();
+    @Column(nullable = false, name = "is_available")
+    private Boolean isAvailable = false;
 
     @Override
     public boolean equals(Object o) {
