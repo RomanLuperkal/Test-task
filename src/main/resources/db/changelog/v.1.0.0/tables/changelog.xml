@@ -8,7 +8,10 @@
         <tagDatabase tag="v.1.0.0"/>
     </changeSet>
 
-    <include file="create-table-categories.xml" relativeToChangelogFile="true"/>
-    <include file="create-table-product.xml" relativeToChangelogFile="true"/>
+    <include file="categories_create.xml" relativeToChangelogFile="true"/>
+    <include file="product_create.xml" relativeToChangelogFile="true"/>
+    <include file="customer_create.xml" relativeToChangelogFile="true"/>
+    <include file="order_create.xml" relativeToChangelogFile="true"/>
+    <include file="curt_create.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

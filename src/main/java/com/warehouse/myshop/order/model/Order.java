@@ -16,10 +16,11 @@ public class Order {
     @GeneratedValue
     private UUID id;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customer;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(nullable = false)
+    private Status status = Status.CREATED;
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
 }
