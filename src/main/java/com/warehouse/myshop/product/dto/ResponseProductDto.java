@@ -1,9 +1,14 @@
 package com.warehouse.myshop.product.dto;
 
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
-import com.warehouse.myshop.enums.Currency;
+import com.warehouse.myshop.currency.enums.Currency;
 import com.warehouse.myshop.product.audit.ProductAudit;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 import java.math.BigDecimal;
 import java.util.Objects;
