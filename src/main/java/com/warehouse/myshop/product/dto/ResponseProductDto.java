@@ -1,6 +1,7 @@
 package com.warehouse.myshop.product.dto;
 
 import com.warehouse.myshop.category.dto.CategoryDtoResp;
+import com.warehouse.myshop.enums.Currency;
 import com.warehouse.myshop.product.audit.ProductAudit;
 import lombok.*;
 
@@ -22,7 +23,7 @@ public class ResponseProductDto {
     private BigDecimal price;
     private Integer quantity;
     private ProductAudit productAudit;
-    private String currency;
+    private Currency currency;
 
     @Override
     public boolean equals(Object o) {
