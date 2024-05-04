@@ -3,7 +3,7 @@ package com.warehouse.myshop.currency;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warehouse.myshop.currency.client.CurrencyServiceClient;
 import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
-import com.warehouse.myshop.enums.Currency;
+import com.warehouse.myshop.currency.enums.Currency;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

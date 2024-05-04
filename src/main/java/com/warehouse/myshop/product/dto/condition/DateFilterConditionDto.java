@@ -1,7 +1,6 @@
 package com.warehouse.myshop.product.dto.condition;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.warehouse.myshop.product.dto.FilterConditionDto;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.data.jpa.domain.Specification;
 

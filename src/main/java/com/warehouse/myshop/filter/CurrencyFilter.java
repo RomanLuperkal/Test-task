@@ -2,7 +2,7 @@ package com.warehouse.myshop.filter;
 
 
 import com.warehouse.myshop.currency.session.CurrencyProvider;
-import com.warehouse.myshop.enums.Currency;
+import com.warehouse.myshop.currency.enums.Currency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

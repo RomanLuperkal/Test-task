@@ -1,4 +1,4 @@
-package com.warehouse.myshop.enums;
+package com.warehouse.myshop.currency.enums;
 
 public enum Currency {
     RUB, EUR, CNY, USD;

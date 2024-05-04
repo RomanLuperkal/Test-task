@@ -1,10 +1,7 @@
-package com.warehouse.myshop.product.dto;
+package com.warehouse.myshop.product.dto.condition;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.warehouse.myshop.product.dto.condition.DateFilterConditionDto;
-import com.warehouse.myshop.product.dto.condition.NumericFilterConditionDto;
-import com.warehouse.myshop.product.dto.condition.StringFilterCondition;
 import com.warehouse.myshop.product.enums.Operation;
 import com.warehouse.myshop.product.model.Product;
 import lombok.Getter;

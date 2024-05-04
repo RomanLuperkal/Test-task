@@ -1,6 +1,5 @@
 package com.warehouse.myshop.product.dto.condition;
 
-import com.warehouse.myshop.product.dto.FilterConditionDto;
 import com.warehouse.myshop.product.model.Product;
 import org.springframework.data.jpa.domain.Specification;
 
