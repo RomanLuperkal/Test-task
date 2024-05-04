@@ -15,6 +15,11 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
 
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=1m
+
 app:
   scheduling:
     enabled: false
@@ -22,4 +27,12 @@ app:
     priceIncrease: 10.1
     optimization: true
     exclusive-lock: false
+
+rest:
+  currency-service:
+    host: http://localhost:8081
+    methods:
+      get-currency: /currency
+    mock:
+      enabled: true
 

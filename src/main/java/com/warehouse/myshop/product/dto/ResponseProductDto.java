@@ -22,6 +22,7 @@ public class ResponseProductDto {
     private BigDecimal price;
     private Integer quantity;
     private ProductAudit productAudit;
+    private String currency;
 
     @Override
     public boolean equals(Object o) {
