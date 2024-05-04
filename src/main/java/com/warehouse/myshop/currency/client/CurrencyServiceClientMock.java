@@ -11,7 +11,7 @@ import java.util.Random;
 
 @Component
 @Slf4j
-@ConditionalOnProperty(name = "rest.currency-service.mock.enabled:false")
+@ConditionalOnProperty(name = "rest.currency-service.mock.enabled")
 @Primary
 public class CurrencyServiceClientMock implements CurrencyServiceClient {
     @Override
