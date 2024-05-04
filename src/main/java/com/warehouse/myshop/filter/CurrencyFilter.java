@@ -23,14 +23,14 @@ public class CurrencyFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        if (uri.startsWith("/product") && method.equals("GET")) {
+        if (uri.startsWith("/product") && method.equals("GET") || uri.contains("search")) {
             String currency = request.getHeader("currency");
             if (currency != null) {
                 Optional.ofNullable(currency)
                         .map(Currency::getCurrency)
                         .ifPresent(currencyProvider::setCurrency);
             }
-            filterChain.doFilter(request, response);
         }
+        filterChain.doFilter(request, response);
     }
 }

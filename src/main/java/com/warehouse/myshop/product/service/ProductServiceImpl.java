@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
         ResponseProductDto responseProductDto = mapper.mapToResponseProductDto(product);
         Currency currency = currencyProvider.getCurrency();
-        responseProductDto.setCurrency(currency.toString());
+        responseProductDto.setCurrency(currency);
         if (!currency.equals(Currency.RUB)) {
             convertPrice(responseProductDto, rateProvider.getExchangeRate(currency));
         }
@@ -83,6 +83,7 @@ public class ProductServiceImpl implements ProductService {
     public ListProductDto getProducts(Pageable pageable) {
         List<ResponseProductDto> responseProducts = mapper.mapToListResponseProductDto(productRepository.findAll(pageable));
         Currency currency = currencyProvider.getCurrency();
+        setCurrencyInProducts(responseProducts, currency);
         if (!currency.equals(Currency.RUB)) {
             responseProducts.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
         }
@@ -99,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
         List<ResponseProductDto> products = mapper
                 .mapToListResponseProductDto(productRepository.findAll(resultSpecification, pageable));
         Currency currency = currencyProvider.getCurrency();
+        setCurrencyInProducts(products, currency);
         if (!currency.equals(Currency.RUB)) {
             products.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
         }
@@ -111,5 +113,9 @@ public class ProductServiceImpl implements ProductService {
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
         BigDecimal rubPrice = responseProduct.getPrice();
         responseProduct.setPrice(rubPrice.divide(currency, 2, RoundingMode.HALF_UP));
+    }
+
+    private void setCurrencyInProducts(List<ResponseProductDto> products, Currency currency) {
+        products.forEach(p -> p.setCurrency(currency));
     }
 }

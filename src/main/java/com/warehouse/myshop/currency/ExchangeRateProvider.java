@@ -19,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class ExchangeRateProvider {
-    private final CurrencyServiceClient currencyServiceClient ;
+    private final CurrencyServiceClient currencyServiceClient;
     private final ObjectMapper objectMapper;
 
     public BigDecimal getExchangeRate(Currency currency) {
@@ -28,13 +28,19 @@ public class ExchangeRateProvider {
     }
 
     private @Nullable BigDecimal getExchangeRateFromService(Currency currency) {
-        return Optional.ofNullable(currencyServiceClient.getCurrenciesRate()).map(rate -> getExchangeRateByCurrency(rate, currency))
-                .orElse(null);
+        try {
+            return Optional.ofNullable(currencyServiceClient.getCurrenciesRate()).map(rate -> getExchangeRateByCurrency(rate, currency))
+                    .orElse(null);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            return null;
+        }
+
     }
 
     private BigDecimal getExchangeRateFromFile(Currency currency) {
         try {
-            log.debug("Чтение курса валют из файла");
+            log.info("Чтение курса валют из файла");
             ResponseCurrencyDto responseCurrencyDto = objectMapper.
                     readValue(readJsonResource("exchange-rate.json"), ResponseCurrencyDto.class);
             return Optional.ofNullable(responseCurrencyDto).map(rate -> getExchangeRateByCurrency(rate, currency))
