@@ -2,6 +2,9 @@ package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
+import com.warehouse.myshop.currency.ExchangeRateProvider;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
+import com.warehouse.myshop.enums.Currency;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.product.dto.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
@@ -12,21 +15,27 @@ import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
+    private final ExchangeRateProvider rateProvider;
 
     @Override
     @Transactional
@@ -61,13 +70,24 @@ public class ProductServiceImpl implements ProductService {
     public ResponseProductDto getProduct(UUID uuid) {
         Product product = productRepository.findById(uuid).orElseThrow(
                 () -> new NotFoundException("Товара с UUID=" + uuid + " не существует"));
-        return mapper.mapToResponseProductDto(product);
+        ResponseProductDto responseProductDto = mapper.mapToResponseProductDto(product);
+        Currency currency = currencyProvider.getCurrency();
+        responseProductDto.setCurrency(currency.toString());
+        if (!currency.equals(Currency.RUB)) {
+            convertPrice(responseProductDto, rateProvider.getExchangeRate(currency));
+        }
+        return responseProductDto;
     }
 
     @Override
     public ListProductDto getProducts(Pageable pageable) {
+        List<ResponseProductDto> responseProducts = mapper.mapToListResponseProductDto(productRepository.findAll(pageable));
+        Currency currency = currencyProvider.getCurrency();
+        if (!currency.equals(Currency.RUB)) {
+            responseProducts.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
+        }
         return ListProductDto.builder()
-                .products(mapper.mapToListResponseProductDto(productRepository.findAll(pageable)))
+                .products(responseProducts)
                 .build();
     }
 
@@ -78,9 +98,18 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(Specification.where(null));
         List<ResponseProductDto> products = mapper
                 .mapToListResponseProductDto(productRepository.findAll(resultSpecification, pageable));
+        Currency currency = currencyProvider.getCurrency();
+        if (!currency.equals(Currency.RUB)) {
+            products.forEach(p -> convertPrice(p, rateProvider.getExchangeRate(currency)));
+        }
         return ListProductDto
                 .builder()
                 .products(products)
                 .build();
+    }
+
+    private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
+        BigDecimal rubPrice = responseProduct.getPrice();
+        responseProduct.setPrice(rubPrice.divide(currency, 2, RoundingMode.HALF_UP));
     }
 }
