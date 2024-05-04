@@ -28,9 +28,11 @@ app:
     optimization: true
     exclusive-lock: false
 
-currency-service:
-  mock: false
-  host: http://localhost:8081
-  methods:
-    get-currency: /currency
+rest:
+  currency-service:
+    host: http://localhost:8081
+    methods:
+      get-currency: /currency
+    mock:
+      enabled: true
 

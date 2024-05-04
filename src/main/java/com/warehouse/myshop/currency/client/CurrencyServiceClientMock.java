@@ -2,7 +2,8 @@ package com.warehouse.myshop.currency.client;
 
 import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -10,7 +11,8 @@ import java.util.Random;
 
 @Component
 @Slf4j
-@ConditionalOnExpression("${currency-service.mock}")
+@ConditionalOnProperty(name = "rest.currency-service.mock.enabled:false")
+@Primary
 public class CurrencyServiceClientMock implements CurrencyServiceClient {
     @Override
     public ResponseCurrencyDto getCurrenciesRate() {
