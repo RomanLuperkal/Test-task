@@ -4,5 +4,5 @@ import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 
 public interface OrderService {
-    ResponseOrderDto createOrder(CreateOrderDto orderDto);
+    ResponseOrderDto createOrder(CreateOrderDto orderDto, Long customerId);
 }

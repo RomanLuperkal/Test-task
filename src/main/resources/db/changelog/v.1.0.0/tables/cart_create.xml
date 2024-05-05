@@ -6,11 +6,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="create-table-curt" author="Roman">
-        <createTable tableName="curt">
+    <changeSet id="create-table-cart" author="Roman">
+        <createTable tableName="cart">
             <column name="order_id" type="UUID">
                 <constraints primaryKey="true" nullable="false"
-                foreignKeyName="fk_order" referencedTableName="order"
+                foreignKeyName="fk_order" referencedTableName="ordering"
                 referencedColumnNames="id" deleteCascade="false"/>
             </column>
             <column name="product_id" type="UUID">
@@ -18,7 +18,7 @@
                              foreignKeyName="fk_product" referencedTableName="product"
                              referencedColumnNames="uuid" deleteCascade="false"/>
             </column>
-            <column name="quantity" type="BIGINT">
+            <column name="quantity" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
             <column name="total_amount" type="NUMERIC(19, 2)">

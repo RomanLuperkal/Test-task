@@ -9,5 +9,5 @@ import java.util.UUID;
 @Setter
 public class ShortProductDto {
     private UUID id;
-    private Long quantity;
+    private Integer quantity;
 }

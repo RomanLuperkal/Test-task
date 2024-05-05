@@ -2,6 +2,7 @@ package com.warehouse.myshop.handler;
 
 import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
+import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.handler.responce.ApiError;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -83,5 +84,16 @@ public class ErrorHandler {
                 .time(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(OrderException.class)
+    private ResponseEntity<ApiError> handleException(OrderException e) {
+        ApiError errorResponse = ApiError.builder()
+                .message(e.getMessage())
+                .reason("Недопустимый заказ")
+                .status(HttpStatus.BAD_REQUEST.toString())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
