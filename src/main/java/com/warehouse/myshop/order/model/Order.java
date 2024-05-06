@@ -19,7 +19,7 @@ public class Order {
     @Id
     @GeneratedValue
     private UUID id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customer;
     @Enumerated(EnumType.STRING)

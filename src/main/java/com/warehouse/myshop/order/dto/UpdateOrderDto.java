@@ -13,5 +13,6 @@ import java.util.List;
 public class UpdateOrderDto {
     @NotNull(message = "products не может быть пустым")
     @NotEmpty(message = "products не может быть пустым")
+    //@JsonValue
     private List<ShortProductDto> products;
 }

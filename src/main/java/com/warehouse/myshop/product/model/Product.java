@@ -23,7 +23,7 @@ public class Product {
     @Column(nullable = false, name = "article_number", unique = true)
     private String articleNumber;
     private String description;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
     @Column(nullable = false)

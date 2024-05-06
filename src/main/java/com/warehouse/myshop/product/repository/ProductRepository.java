@@ -26,12 +26,12 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, U
     Boolean existsAllByUuidInAndIsAvailableIsTrue(List<UUID> uuids);
 
     @Query("SELECT " +
-            "CASE WHEN COUNT(p) >= 1 THEN true ELSE false END " +
+            "CASE WHEN COUNT(p) = :size THEN true ELSE false END " +
             "FROM Product p " +
-            "WHERE p.uuid = :uuid " +
-            "AND p.quantity >= :quantity")
-    Boolean isSufficientProductInStock(@Param("uuid") UUID uuid, @Param("quantity") Integer quantity);
+            "WHERE p.uuid in :uuids")
+    Boolean isExistsProducts(@Param("uuids") List<UUID> uuids, @Param("size") Long size);
 
+    //productRepository.isSufficientProductInStock(List.of(UUID.fromString("7f43c238-f849-4a1a-9e48-392f21e1d67e"), UUID.randomUUID()), productIds.size())
     @Transactional(propagation = Propagation.MANDATORY)
     @Modifying
     @Query("UPDATE Product p SET p.quantity = p.quantity - :quantity WHERE p.uuid = :uuid")

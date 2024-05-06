@@ -1,5 +1,6 @@
 package com.warehouse.myshop.handler;
 
+import com.warehouse.myshop.handler.exceptions.AccessException;
 import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.exceptions.OrderException;
@@ -95,5 +96,16 @@ public class ErrorHandler {
                 .time(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessException.class)
+    private ResponseEntity<ApiError> handleException(AccessException e) {
+        ApiError errorResponse = ApiError.builder()
+                .message(e.getMessage())
+                .reason("Отказано в доступе")
+                .status(HttpStatus.FORBIDDEN.toString())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 }

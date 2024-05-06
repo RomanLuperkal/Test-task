@@ -2,11 +2,12 @@ package com.warehouse.myshop.order.service;
 
 import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
-import com.warehouse.myshop.order.dto.UpdateOrderDto;
+import com.warehouse.myshop.product.dto.ShortProductDto;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
     ResponseOrderDto createOrder(CreateOrderDto orderDto, Long customerId);
-    ResponseOrderDto updateOrder(UpdateOrderDto updateOrder, Long customerId, UUID orderId);
+    ResponseOrderDto updateOrder(List<ShortProductDto> updateOrder, Long customerId, UUID orderId);
 }
