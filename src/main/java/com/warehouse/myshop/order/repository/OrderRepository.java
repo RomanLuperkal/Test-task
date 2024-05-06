@@ -1,11 +1,11 @@
 package com.warehouse.myshop.order.repository;
 
-import com.warehouse.myshop.order.model.Ordering;
+import com.warehouse.myshop.order.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Ordering, UUID> {
+public interface OrderRepository extends JpaRepository<Order, UUID> {
 }

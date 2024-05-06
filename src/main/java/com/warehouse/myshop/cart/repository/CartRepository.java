@@ -1,7 +1,7 @@
-package com.warehouse.myshop.curt.repository;
+package com.warehouse.myshop.cart.repository;
 
-import com.warehouse.myshop.curt.model.Cart;
-import com.warehouse.myshop.curt.model.CartKey;
+import com.warehouse.myshop.cart.model.Cart;
+import com.warehouse.myshop.cart.model.CartKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

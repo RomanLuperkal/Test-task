@@ -6,7 +6,7 @@
 
     <changeSet id="add_is_available_column" author="Roman">
         <addColumn tableName="product">
-            <column name="is_available" type="boolean" defaultValue="false">
+            <column name="is_available" type="boolean" defaultValue="true">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

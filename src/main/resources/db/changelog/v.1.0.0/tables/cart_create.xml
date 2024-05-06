@@ -10,7 +10,7 @@
         <createTable tableName="cart">
             <column name="order_id" type="UUID">
                 <constraints primaryKey="true" nullable="false"
-                foreignKeyName="fk_order" referencedTableName="ordering"
+                foreignKeyName="fk_order" referencedTableName="customer_order"
                 referencedColumnNames="id" deleteCascade="false"/>
             </column>
             <column name="product_id" type="UUID">

@@ -1,16 +1,16 @@
 package com.warehouse.myshop.order.service;
 
-import com.warehouse.myshop.curt.model.Cart;
-import com.warehouse.myshop.curt.model.CartKey;
-import com.warehouse.myshop.curt.repository.CartRepository;
+import com.warehouse.myshop.cart.model.Cart;
+import com.warehouse.myshop.cart.repository.CartRepository;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
+import com.warehouse.myshop.order.dto.UpdateOrderDto;
 import com.warehouse.myshop.order.mapper.OrderMapper;
-import com.warehouse.myshop.order.model.Ordering;
+import com.warehouse.myshop.order.model.Order;
 import com.warehouse.myshop.order.repository.OrderRepository;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 import com.warehouse.myshop.product.model.Product;
@@ -19,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,44 +37,52 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public ResponseOrderDto createOrder(CreateOrderDto orderDto, Long customerId) {
         List<ShortProductDto> orderProducts = orderDto.getProducts();
-        List<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toList());
+        if (orderProducts.stream().map(ShortProductDto::getId).distinct().count() != orderProducts.size()) {
+            throw new OrderException("В заказе присутсвуют дублирующиеся товары");
+        }
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id=" + customerId + " не существует"));
-        /*if (!productRepository.existsAllByUuidIn(productIds)) {
-            throw new OrderException("В корзине присутствуют несуществующие товары товары");
-        }*/
+        List<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toList());
         List<Product> products = (ArrayList) productRepository.findAllById(productIds);
-        Ordering ordering = mapper.mapToOrder(orderDto);
-        ordering.setCustomer(customer);
-        ordering.setDeliveryAddress(orderDto.getDeliveryAddress());
-        Ordering savedOrdering = orderRepository.save(ordering);
-        //todo проверить is_avaiable
+        Order order = mapper.mapToOrder(orderDto);
+        order.setCustomer(customer);
+        order.setDeliveryAddress(orderDto.getDeliveryAddress());
+        Order savedOrder = orderRepository.save(order);
         for (ShortProductDto shortProduct : orderProducts) {
             Product product = products.stream().filter(p -> p.getUuid().equals(shortProduct.getId())).findFirst()
                     .orElseThrow(() -> new OrderException("В корзине присутствуют несуществующие товары товары"));
+            if (!product.getIsAvailable()) {
+                throw new OrderException("Товар с id=" + product.getUuid() + " недоспупен к заказу");
+            }
             int totalQuantity = product.getQuantity() - shortProduct.getQuantity();
             if (totalQuantity < 0) {
-                throw new OrderException("Товара с " + shortProduct.getId() + " нет в достаточной количестве");
+                throw new OrderException("Товара с id=" + shortProduct.getId() + " нет в достаточном количестве");
             } else {
                 product.setQuantity(totalQuantity);
             }
-            /*if (!productRepository.isSufficientProductInStock(shortProduct.getId(), shortProduct.getQuantity())) {
-                throw new OrderException("Товара с " + shortProduct.getId() + " нет в достаточной количестве");
-            }*/
-            //productRepository.updateProductQuantityByUuid(shortProduct.getId(), shortProduct.getQuantity());
-           // BigDecimal price = productRepository.getPriceByUuid(shortProduct.getId());
-            /*curtRepository.insertCart(savedOrdering.getId(),product.getId(), product.getQuantity(),
-                    price.multiply(BigDecimal.valueOf(product.getQuantity())));*/
+
             Cart cart = new Cart();
-            //CartKey cartKey = new CartKey(savedOrdering, product);
-            //cart.setId(cartKey);
-            cart.setOrder(savedOrdering);
+
+            cart.setOrder(savedOrder);
             cart.setProduct(product);
             cart.setQuantity(shortProduct.getQuantity());
             cart.setPrice(product.getPrice());
             cartRepository.save(cart);
         }
+       return mapper.mapToResponseOrderDto(order);
+    }
 
-       return null;
+    @Override
+    public ResponseOrderDto updateOrder(UpdateOrderDto updateOrder, Long customerId, UUID orderId) {
+        if (!customerRepository.existsById(customerId)) {
+            throw new NotFoundException("Пользователя с id=" + customerId + " не существует");
+        }
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
+        if (!order.getCustomer().getId().equals(customerId)) {
+            //todo сделать исключение на отказ доступа
+        }
+        Set<Cart> carts = order.getCarts();
+        return null;
     }
 }

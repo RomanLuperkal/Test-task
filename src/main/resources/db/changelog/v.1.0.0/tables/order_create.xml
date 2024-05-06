@@ -6,8 +6,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="create-table-ordering" author="Roman">
-        <createTable tableName="ordering">
+    <changeSet id="create-table-order" author="Roman">
+        <createTable tableName="customer_order">
             <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
