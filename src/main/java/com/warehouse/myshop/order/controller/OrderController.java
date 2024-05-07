@@ -1,6 +1,7 @@
 package com.warehouse.myshop.order.controller;
 
 import com.warehouse.myshop.order.dto.CreateOrderDto;
+import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 import com.warehouse.myshop.order.service.OrderService;
 import com.warehouse.myshop.product.dto.ShortProductDto;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +43,11 @@ public class OrderController {
                                                         @RequestBody @Valid List<ShortProductDto> updateOrder,
                                                         @PathVariable UUID orderId) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.updateOrder(updateOrder, customerId, orderId));
+    }
+
+    @GetMapping("{orderId}")
+    public ResponseEntity<ResponseFullOrderDto> getOrder(@PathVariable UUID orderId,
+                                                         @RequestHeader("customerId") @Min(1) Long customerId) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrder(orderId, customerId));
     }
 }

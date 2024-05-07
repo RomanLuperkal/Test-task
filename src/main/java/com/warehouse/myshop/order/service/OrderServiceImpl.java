@@ -8,11 +8,13 @@ import com.warehouse.myshop.handler.exceptions.AccessException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
+import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 import com.warehouse.myshop.order.enums.Status;
 import com.warehouse.myshop.order.mapper.OrderMapper;
 import com.warehouse.myshop.order.model.Order;
 import com.warehouse.myshop.order.repository.OrderRepository;
+import com.warehouse.myshop.product.dto.ProductDto;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,13 +53,64 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(customer);
         order.setDeliveryAddress(orderDto.getDeliveryAddress());
         Order savedOrder = orderRepository.save(order);
+        List<Cart> newCarts = createCarts(orderProducts, products, savedOrder);
+        cartRepository.saveAll(newCarts);
+       return mapper.mapToResponseOrderDto(order);
+    }
+
+    @Override
+    @Transactional
+    public ResponseOrderDto updateOrder(List<ShortProductDto> orderProducts, Long customerId, UUID orderId) {
+        List<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toList());
+        if (!productRepository.isExistsProducts(productIds, (long) productIds.size())) {
+            throw new OrderException("В заказе присутсвуют несуществующие товары");
+        }
+        Order order = orderRepository.findFullOrderByOrderId(orderId)
+                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
+        validateCustomer(order, customerId);
+        if (!order.getStatus().equals(Status.CREATED)) {
+            throw new OrderException("Изменить можно только заказ со статусом CREATED");
+        }
+
+        Set<Cart> carts = order.getCarts();
+
+        List<Product> products = (ArrayList<Product>) productRepository.findAllById(productIds);
+        List<Cart> newCarts = updateCarts(orderProducts, carts, products, order);
+        cartRepository.saveAll(newCarts);
+        return mapper.mapToResponseOrderDto(order);
+    }
+
+    @Override
+    public ResponseFullOrderDto getOrder(UUID orderId, Long customerId) {
+        Order order = orderRepository.findOrderWithCustomerByOrderId(orderId)
+                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
+        validateCustomer(order, customerId);
+        List<ProductDto> products = cartRepository.findOrderProductsByOrderId(orderId);
+        BigDecimal totalPrice = products.stream().map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return ResponseFullOrderDto.builder()
+                .orderId(orderId)
+                .products(products)
+                .totalPrice(totalPrice)
+                .build();
+    }
+
+    private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
+        int totalQuantity = actualQuantity - orderingQuantity;
+        if (totalQuantity < 0) {
+            throw new OrderException("Товара нет в достаточном количестве");
+        }
+        return totalQuantity;
+    }
+
+    public List<Cart> createCarts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
+        List<Cart> newCarts = new ArrayList<>();
         for (ShortProductDto shortProduct : orderProducts) {
             Product product = products.stream().filter(p -> p.getUuid().equals(shortProduct.getId())).findFirst()
                     .orElseThrow(() -> new OrderException("В корзине присутствуют несуществующие товары товары"));
             if (!product.getIsAvailable()) {
                 throw new OrderException("Товар с id=" + product.getUuid() + " недоспупен к заказу");
             }
-            //int totalQuantity = product.getQuantity() - shortProduct.getQuantity();
             int totalQuantity = calculateQuantity(product.getQuantity(), shortProduct.getQuantity());
             product.setQuantity(totalQuantity);
 
@@ -67,31 +121,14 @@ public class OrderServiceImpl implements OrderService {
             cart.setProduct(product);
             cart.setQuantity(shortProduct.getQuantity());
             cart.setPrice(product.getPrice());
-            cartRepository.save(cart);
+            newCarts.add(cart);
         }
-       return mapper.mapToResponseOrderDto(order);
+        return newCarts;
     }
 
-    @Override
-    @Transactional
-    public ResponseOrderDto updateOrder(List<ShortProductDto> updateOrder, Long customerId, UUID orderId) {
-        List<UUID> productIds = updateOrder.stream().map(ShortProductDto::getId).collect(Collectors.toList());
-        if (!productRepository.isExistsProducts(productIds, (long) productIds.size())) {
-            throw new OrderException("В заказе присутсвуют несуществующие товары");
-        }
-        Order order = orderRepository.findOrderByOrderId(orderId)
-                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
-        if(!order.getCustomer().getId().equals(customerId)) {
-            throw new AccessException("Пользователь не является владельцем данного заказа");
-        }
-        if (!order.getStatus().equals(Status.CREATED)) {
-            throw new OrderException("Изменить можно только заказ со статусом CREATED");
-        }
-
-        Set<Cart> carts = order.getCarts();
+    public List<Cart> updateCarts(List<ShortProductDto> orderProducts, Set<Cart> carts , List<Product> products , Order order) {
         List<Cart> newCarts = new ArrayList<>();
-        List<Product> products = (ArrayList<Product>) productRepository.findAllById(productIds);
-        for (ShortProductDto shortProduct : updateOrder) {
+        for (ShortProductDto shortProduct : orderProducts) {
             Optional<Cart> optionalCart = carts.stream().filter(c -> c.getProduct().getUuid().equals(shortProduct.getId())).findFirst();
             if (optionalCart.isPresent()) {
                 Cart cart = optionalCart.get();
@@ -112,16 +149,13 @@ public class OrderServiceImpl implements OrderService {
                 cart.setPrice(product.getPrice());
                 newCarts.add(cart);
             }
-            cartRepository.saveAll(newCarts);
         }
-        return null;
+        return newCarts;
     }
 
-    private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
-        int totalQuantity = actualQuantity - orderingQuantity;
-        if (totalQuantity < 0) {
-            throw new OrderException("Товара нет в достаточном количестве");
+    private void validateCustomer(Order order, Long customerId) {
+        if(!order.getCustomer().getId().equals(customerId)) {
+            throw new AccessException("Пользователь не является владельцем данного заказа");
         }
-        return totalQuantity;
     }
 }
