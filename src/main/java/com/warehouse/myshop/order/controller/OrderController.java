@@ -3,6 +3,7 @@ package com.warehouse.myshop.order.controller;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
+import com.warehouse.myshop.order.dto.StatusDto;
 import com.warehouse.myshop.order.service.OrderService;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,16 @@ public class OrderController {
                                             @RequestHeader("customerId") @Min(1) Long customerId) {
         orderService.deleteOrder(orderId, customerId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("{orderId}/confirm")
+    public void confirmOrder(@PathVariable UUID orderId,
+                             @RequestHeader("customerId") @Min(1) Long customerId) {
+    }
+
+    @PatchMapping ("{orderId}/status")
+    public ResponseEntity<ResponseOrderDto> changeStatusOrder(@PathVariable UUID orderId,
+                                                              @RequestBody @Valid StatusDto status) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(orderId, status));
     }
 }

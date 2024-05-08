@@ -3,6 +3,7 @@ package com.warehouse.myshop.order.service;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
+import com.warehouse.myshop.order.dto.StatusDto;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface OrderService {
     ResponseOrderDto updateOrder(List<ShortProductDto> updateOrder, Long customerId, UUID orderId);
     ResponseFullOrderDto getOrder(UUID orderId, Long customerId);
     void deleteOrder(UUID orderId, Long customerId);
+    ResponseOrderDto changeStatusOrder(UUID orderId, StatusDto status);
 }

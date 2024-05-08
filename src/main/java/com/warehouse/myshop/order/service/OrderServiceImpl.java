@@ -1,7 +1,6 @@
 package com.warehouse.myshop.order.service;
 
 import com.warehouse.myshop.cart.model.Cart;
-import com.warehouse.myshop.cart.model.CartKey;
 import com.warehouse.myshop.cart.repository.CartRepository;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
@@ -11,6 +10,7 @@ import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
+import com.warehouse.myshop.order.dto.StatusDto;
 import com.warehouse.myshop.order.enums.Status;
 import com.warehouse.myshop.order.mapper.OrderMapper;
 import com.warehouse.myshop.order.model.Order;
@@ -112,6 +112,15 @@ public class OrderServiceImpl implements OrderService {
             product.setQuantity(product.getQuantity() + c.getQuantity());
         });
         cartRepository.deleteAll(carts);
+    }
+
+    @Override
+    @Transactional
+    public ResponseOrderDto changeStatusOrder(UUID orderId, StatusDto status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
+        order.setStatus(status.getStatus());
+        return mapper.mapToResponseOrderDto(order);
     }
 
     private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
