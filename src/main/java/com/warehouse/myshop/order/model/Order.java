@@ -27,6 +27,6 @@ public class Order {
     private Status status = Status.CREATED;
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order")
     private Set<Cart> carts = new HashSet<>();
 }

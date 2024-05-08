@@ -1,6 +1,7 @@
 package com.warehouse.myshop.order.service;
 
 import com.warehouse.myshop.cart.model.Cart;
+import com.warehouse.myshop.cart.model.CartKey;
 import com.warehouse.myshop.cart.repository.CartRepository;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
@@ -95,6 +96,24 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void deleteOrder(UUID orderId, Long customerId) {
+        Order order = orderRepository.findFullOrderByOrderId(orderId)
+                .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
+        validateCustomer(order, customerId);
+        if (order.getStatus() != Status.CREATED) {
+            throw new OrderException("Удалить можно только заказ находящийся в статусе CREATED");
+        }
+        order.setStatus(Status.CANCELLED);
+        Set<Cart> carts = order.getCarts();
+        carts.forEach(c -> {
+            Product product = c.getProduct();
+            product.setQuantity(product.getQuantity() + c.getQuantity());
+        });
+        cartRepository.deleteAll(carts);
+    }
+
     private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
         int totalQuantity = actualQuantity - orderingQuantity;
         if (totalQuantity < 0) {
@@ -103,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
         return totalQuantity;
     }
 
-    public List<Cart> createCarts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
+    private List<Cart> createCarts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
         List<Cart> newCarts = new ArrayList<>();
         for (ShortProductDto shortProduct : orderProducts) {
             Product product = products.stream().filter(p -> p.getUuid().equals(shortProduct.getId())).findFirst()
@@ -126,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
         return newCarts;
     }
 
-    public List<Cart> updateCarts(List<ShortProductDto> orderProducts, Set<Cart> carts , List<Product> products , Order order) {
+    private List<Cart> updateCarts(List<ShortProductDto> orderProducts, Set<Cart> carts , List<Product> products , Order order) {
         List<Cart> newCarts = new ArrayList<>();
         for (ShortProductDto shortProduct : orderProducts) {
             Optional<Cart> optionalCart = carts.stream().filter(c -> c.getProduct().getUuid().equals(shortProduct.getId())).findFirst();
