@@ -111,7 +111,6 @@ public class OrderServiceImpl implements OrderService {
             Product product = c.getProduct();
             product.setQuantity(product.getQuantity() + c.getQuantity());
         });
-        cartRepository.deleteAll(carts);
     }
 
     @Override
