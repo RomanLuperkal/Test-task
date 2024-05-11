@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("SELECT o FROM Order o " +
-            "JOIN FETCH o.carts AS c " +
+            "JOIN FETCH o.orderedProducts AS c " +
             "JOIN FETCH o.customer " +
             "JOIN FETCH c.product " +
             "WHERE o.id = :order_id")

@@ -1,4 +1,4 @@
-package com.warehouse.myshop.cart.model;
+package com.warehouse.myshop.orderedproduct.model;
 
 
 import com.warehouse.myshop.order.model.Order;
@@ -13,14 +13,16 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@IdClass(CartKey.class)
-public class Cart {
+@IdClass(OrderedProductKey.class)
+@Table(name = "ordered_product")
+public class OrderedProduct {
     @Id
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -41,9 +43,9 @@ public class Cart {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Cart cart = (Cart) o;
-        return order != null && Objects.equals(order, cart.order)
-                && product != null && Objects.equals(product, cart.product);
+        OrderedProduct orderedProduct = (OrderedProduct) o;
+        return order != null && Objects.equals(order, orderedProduct.order)
+                && product != null && Objects.equals(product, orderedProduct.product);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.warehouse.myshop.order.model;
 
-import com.warehouse.myshop.cart.model.Cart;
+import com.warehouse.myshop.orderedproduct.model.OrderedProduct;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.order.enums.Status;
 import lombok.Getter;
@@ -28,5 +28,5 @@ public class Order {
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
     @OneToMany(mappedBy = "order")
-    private Set<Cart> carts = new HashSet<>();
+    private Set<OrderedProduct> orderedProducts = new HashSet<>();
 }

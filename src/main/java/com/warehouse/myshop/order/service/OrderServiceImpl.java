@@ -1,7 +1,5 @@
 package com.warehouse.myshop.order.service;
 
-import com.warehouse.myshop.cart.model.Cart;
-import com.warehouse.myshop.cart.repository.CartRepository;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
 import com.warehouse.myshop.handler.exceptions.AccessException;
@@ -15,6 +13,8 @@ import com.warehouse.myshop.order.enums.Status;
 import com.warehouse.myshop.order.mapper.OrderMapper;
 import com.warehouse.myshop.order.model.Order;
 import com.warehouse.myshop.order.repository.OrderRepository;
+import com.warehouse.myshop.orderedproduct.model.OrderedProduct;
+import com.warehouse.myshop.orderedproduct.repository.CartRepository;
 import com.warehouse.myshop.product.dto.ProductDto;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 import com.warehouse.myshop.product.model.Product;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final CartRepository cartRepository;
     private final OrderMapper mapper;
+
     @Override
     @Transactional
     public ResponseOrderDto createOrder(CreateOrderDto orderDto, Long customerId) {
@@ -48,21 +49,21 @@ public class OrderServiceImpl implements OrderService {
         }
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new NotFoundException("Пользователя с id=" + customerId + " не существует"));
-        List<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toList());
-        List<Product> products = (ArrayList<Product>) productRepository.findAllById(productIds);
+        Set<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toSet());
+        List<Product> products = productRepository.findAllByUuidIn(productIds);
         Order order = mapper.mapToOrder(orderDto);
         order.setCustomer(customer);
         order.setDeliveryAddress(orderDto.getDeliveryAddress());
         Order savedOrder = orderRepository.save(order);
-        List<Cart> newCarts = createCarts(orderProducts, products, savedOrder);
-        cartRepository.saveAll(newCarts);
-       return mapper.mapToResponseOrderDto(order);
+        List<OrderedProduct> newOrderedProducts = createOrderedProducts(orderProducts, products, savedOrder);
+        cartRepository.saveAll(newOrderedProducts);
+        return mapper.mapToResponseOrderDto(order);
     }
 
     @Override
     @Transactional
     public ResponseOrderDto updateOrder(List<ShortProductDto> orderProducts, Long customerId, UUID orderId) {
-        List<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toList());
+        Set<UUID> productIds = orderProducts.stream().map(ShortProductDto::getId).collect(Collectors.toSet());
         if (!productRepository.isExistsProducts(productIds, (long) productIds.size())) {
             throw new OrderException("В заказе присутсвуют несуществующие товары");
         }
@@ -73,11 +74,11 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderException("Изменить можно только заказ со статусом CREATED");
         }
 
-        Set<Cart> carts = order.getCarts();
+        Set<OrderedProduct> orderedProducts = order.getOrderedProducts();
 
-        List<Product> products = (ArrayList<Product>) productRepository.findAllById(productIds);
-        List<Cart> newCarts = updateCarts(orderProducts, carts, products, order);
-        cartRepository.saveAll(newCarts);
+        List<Product> products = productRepository.findAllByUuidIn(productIds);
+        List<OrderedProduct> newOrderedProducts = updateCarts(orderProducts, orderedProducts, products, order);
+        cartRepository.saveAll(newOrderedProducts);
         return mapper.mapToResponseOrderDto(order);
     }
 
@@ -106,8 +107,8 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderException("Удалить можно только заказ находящийся в статусе CREATED");
         }
         order.setStatus(Status.CANCELLED);
-        Set<Cart> carts = order.getCarts();
-        carts.forEach(c -> {
+        Set<OrderedProduct> orderedProducts = order.getOrderedProducts();
+        orderedProducts.forEach(c -> {
             Product product = c.getProduct();
             product.setQuantity(product.getQuantity() + c.getQuantity());
         });
@@ -130,11 +131,14 @@ public class OrderServiceImpl implements OrderService {
         return totalQuantity;
     }
 
-    private List<Cart> createCarts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
-        List<Cart> newCarts = new ArrayList<>();
+    private List<OrderedProduct> createOrderedProducts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
+        List<OrderedProduct> newOrderedProducts = new ArrayList<>();
+        Map<UUID, Product> mapProducts = products.stream().collect(Collectors.toMap(Product::getUuid, p -> p));
         for (ShortProductDto shortProduct : orderProducts) {
-            Product product = products.stream().filter(p -> p.getUuid().equals(shortProduct.getId())).findFirst()
-                    .orElseThrow(() -> new OrderException("В корзине присутствуют несуществующие товары товары"));
+            Product product = mapProducts.get(shortProduct.getId());
+            if (product == null) {
+                throw new OrderException("В корзине присутствуют несуществующие товары товары");
+            }
             if (!product.getIsAvailable()) {
                 throw new OrderException("Товар с id=" + product.getUuid() + " недоспупен к заказу");
             }
@@ -142,46 +146,48 @@ public class OrderServiceImpl implements OrderService {
             product.setQuantity(totalQuantity);
 
 
-            Cart cart = new Cart();
+            OrderedProduct orderedProduct = new OrderedProduct();
 
-            cart.setOrder(savedOrder);
-            cart.setProduct(product);
-            cart.setQuantity(shortProduct.getQuantity());
-            cart.setPrice(product.getPrice());
-            newCarts.add(cart);
+            orderedProduct.setOrder(savedOrder);
+            orderedProduct.setProduct(product);
+            orderedProduct.setQuantity(shortProduct.getQuantity());
+            orderedProduct.setPrice(product.getPrice());
+            newOrderedProducts.add(orderedProduct);
         }
-        return newCarts;
+        return newOrderedProducts;
     }
 
-    private List<Cart> updateCarts(List<ShortProductDto> orderProducts, Set<Cart> carts , List<Product> products , Order order) {
-        List<Cart> newCarts = new ArrayList<>();
+    private List<OrderedProduct> updateCarts(List<ShortProductDto> orderProducts, Set<OrderedProduct> orderedProducts, List<Product> products, Order order) {
+        List<OrderedProduct> newOrderedProducts = new ArrayList<>();
+
+        Map<UUID, OrderedProduct> mapOrderedProducts = orderedProducts.stream()
+                .collect(Collectors.toMap(op -> op.getProduct().getUuid(), op -> op));
         for (ShortProductDto shortProduct : orderProducts) {
-            Optional<Cart> optionalCart = carts.stream().filter(c -> c.getProduct().getUuid().equals(shortProduct.getId())).findFirst();
-            if (optionalCart.isPresent()) {
-                Cart cart = optionalCart.get();
-                int orderingQuantity = cart.getQuantity() + shortProduct.getQuantity();
-                int totalQuantityProduct = calculateQuantity(cart.getProduct().getQuantity(), shortProduct.getQuantity());
-                cart.setQuantity(orderingQuantity);
-                cart.getProduct().setQuantity(totalQuantityProduct);
-                cart.setPrice(cart.getProduct().getPrice());
+            OrderedProduct orderedProduct = mapOrderedProducts.get(shortProduct.getId());
+            if (orderedProduct != null) {
+                int orderingQuantity = orderedProduct.getQuantity() + shortProduct.getQuantity();
+                int totalQuantityProduct = calculateQuantity(orderedProduct.getProduct().getQuantity(), shortProduct.getQuantity());
+                orderedProduct.setQuantity(orderingQuantity);
+                orderedProduct.getProduct().setQuantity(totalQuantityProduct);
+                orderedProduct.setPrice(orderedProduct.getProduct().getPrice());
             } else {
-                Cart cart = new Cart();
+                orderedProduct = new OrderedProduct();
                 Product product = products.stream().filter(p -> p.getUuid().equals(shortProduct.getId()))
                         .findFirst().orElseThrow(() -> new OrderException("В корзине присутствуют несуществующие товары товары"));
                 int totalQuantity = calculateQuantity(product.getQuantity(), shortProduct.getQuantity());
                 product.setQuantity(totalQuantity);
-                cart.setOrder(order);
-                cart.setProduct(product);
-                cart.setQuantity(shortProduct.getQuantity());
-                cart.setPrice(product.getPrice());
-                newCarts.add(cart);
+                orderedProduct.setOrder(order);
+                orderedProduct.setProduct(product);
+                orderedProduct.setQuantity(shortProduct.getQuantity());
+                orderedProduct.setPrice(product.getPrice());
+                newOrderedProducts.add(orderedProduct);
             }
         }
-        return newCarts;
+        return newOrderedProducts;
     }
 
     private void validateCustomer(Order order, Long customerId) {
-        if(!order.getCustomer().getId().equals(customerId)) {
+        if (!order.getCustomer().getId().equals(customerId)) {
             throw new AccessException("Пользователь не является владельцем данного заказа");
         }
     }

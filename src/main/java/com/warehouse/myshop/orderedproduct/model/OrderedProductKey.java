@@ -1,4 +1,4 @@
-package com.warehouse.myshop.cart.model;
+package com.warehouse.myshop.orderedproduct.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartKey implements Serializable {
+public class OrderedProductKey implements Serializable {
     private UUID order;
     private UUID product;
 
@@ -22,9 +22,9 @@ public class CartKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        CartKey cartKey = (CartKey) o;
-        return order != null && Objects.equals(order, cartKey.order)
-                && product != null && Objects.equals(product, cartKey.product);
+        OrderedProductKey orderedProductKey = (OrderedProductKey) o;
+        return order != null && Objects.equals(order, orderedProductKey.order)
+                && product != null && Objects.equals(product, orderedProductKey.product);
     }
 
     @Override

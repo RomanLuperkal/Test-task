@@ -12,6 +12,6 @@
     <include file="product_create.xml" relativeToChangelogFile="true"/>
     <include file="customer_create.xml" relativeToChangelogFile="true"/>
     <include file="order_create.xml" relativeToChangelogFile="true"/>
-    <include file="cart_create.xml" relativeToChangelogFile="true"/>
+    <include file="ordered_product_create.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
