@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface CartRepository extends JpaRepository<OrderedProduct, OrderedProductKey> {
+public interface OrderedProductRepository extends JpaRepository<OrderedProduct, OrderedProductKey> {
     @Query("SELECT new com.warehouse.myshop.product.dto.ProductDto(c.product.uuid, c.product.name, c.quantity, c.price) " +
             "FROM OrderedProduct c " +
             "WHERE c.order.id = :order_id")

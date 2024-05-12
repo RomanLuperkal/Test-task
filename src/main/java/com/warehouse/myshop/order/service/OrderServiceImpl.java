@@ -14,7 +14,7 @@ import com.warehouse.myshop.order.mapper.OrderMapper;
 import com.warehouse.myshop.order.model.Order;
 import com.warehouse.myshop.order.repository.OrderRepository;
 import com.warehouse.myshop.orderedproduct.model.OrderedProduct;
-import com.warehouse.myshop.orderedproduct.repository.CartRepository;
+import com.warehouse.myshop.orderedproduct.repository.OrderedProductRepository;
 import com.warehouse.myshop.product.dto.ProductDto;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 import com.warehouse.myshop.product.model.Product;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
-    private final CartRepository cartRepository;
+    private final OrderedProductRepository orderedProductRepository;
     private final OrderMapper mapper;
 
     @Override
@@ -54,10 +54,10 @@ public class OrderServiceImpl implements OrderService {
         Order order = mapper.mapToOrder(orderDto);
         order.setCustomer(customer);
         order.setDeliveryAddress(orderDto.getDeliveryAddress());
+        Set<OrderedProduct> newOrderedProducts = createOrderedProducts(orderProducts, products, order);
+        order.setOrderedProducts(newOrderedProducts);
         Order savedOrder = orderRepository.save(order);
-        List<OrderedProduct> newOrderedProducts = createOrderedProducts(orderProducts, products, savedOrder);
-        cartRepository.saveAll(newOrderedProducts);
-        return mapper.mapToResponseOrderDto(order);
+        return mapper.mapToResponseOrderDto(savedOrder);
     }
 
     @Override
@@ -77,8 +77,8 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderedProduct> orderedProducts = order.getOrderedProducts();
 
         List<Product> products = productRepository.findAllByUuidIn(productIds);
-        List<OrderedProduct> newOrderedProducts = updateCarts(orderProducts, orderedProducts, products, order);
-        cartRepository.saveAll(newOrderedProducts);
+        Set<OrderedProduct> newOrderedProducts = updateCarts(orderProducts, orderedProducts, products, order);
+        order.getOrderedProducts().addAll(newOrderedProducts);
         return mapper.mapToResponseOrderDto(order);
     }
 
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findOrderWithCustomerByOrderId(orderId)
                 .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
         validateCustomer(order, customerId);
-        List<ProductDto> products = cartRepository.findOrderProductsByOrderId(orderId);
+        List<ProductDto> products = orderedProductRepository.findOrderProductsByOrderId(orderId);
         BigDecimal totalPrice = products.stream().map(p -> p.getPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return ResponseFullOrderDto.builder()
@@ -131,8 +131,8 @@ public class OrderServiceImpl implements OrderService {
         return totalQuantity;
     }
 
-    private List<OrderedProduct> createOrderedProducts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
-        List<OrderedProduct> newOrderedProducts = new ArrayList<>();
+    private Set<OrderedProduct> createOrderedProducts(List<ShortProductDto> orderProducts, List<Product> products, Order savedOrder) {
+        Set<OrderedProduct> newOrderedProducts = new HashSet<>();
         Map<UUID, Product> mapProducts = products.stream().collect(Collectors.toMap(Product::getUuid, p -> p));
         for (ShortProductDto shortProduct : orderProducts) {
             Product product = mapProducts.get(shortProduct.getId());
@@ -157,8 +157,8 @@ public class OrderServiceImpl implements OrderService {
         return newOrderedProducts;
     }
 
-    private List<OrderedProduct> updateCarts(List<ShortProductDto> orderProducts, Set<OrderedProduct> orderedProducts, List<Product> products, Order order) {
-        List<OrderedProduct> newOrderedProducts = new ArrayList<>();
+    private Set<OrderedProduct> updateCarts(List<ShortProductDto> orderProducts, Set<OrderedProduct> orderedProducts, List<Product> products, Order order) {
+        Set<OrderedProduct> newOrderedProducts = new HashSet<>();
 
         Map<UUID, OrderedProduct> mapOrderedProducts = orderedProducts.stream()
                 .collect(Collectors.toMap(op -> op.getProduct().getUuid(), op -> op));
