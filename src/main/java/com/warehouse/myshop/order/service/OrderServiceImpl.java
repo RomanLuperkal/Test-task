@@ -1,11 +1,14 @@
 package com.warehouse.myshop.order.service;
 
+import com.warehouse.myshop.account.AccountProvider;
+import com.warehouse.myshop.crm.CrmProvider;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
 import com.warehouse.myshop.handler.exceptions.AccessException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.order.dto.CreateOrderDto;
+import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 import com.warehouse.myshop.order.dto.StatusDto;
@@ -20,6 +23,7 @@ import com.warehouse.myshop.product.dto.ShortProductDto;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +45,8 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final OrderedProductRepository orderedProductRepository;
     private final OrderMapper mapper;
+    private final AccountProvider accountProvider;
+    private final CrmProvider crmProvider;
 
     @Override
     @Transactional
@@ -121,6 +129,18 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new OrderException("Заказа с id=" + orderId + " не существует"));
         order.setStatus(status.getStatus());
         return mapper.mapToResponseOrderDto(order);
+    }
+
+    @Override
+    @SneakyThrows
+    public Map<UUID, List<OrderInfo>> getOrdersInfo() {
+        Set<Order> findOrders = orderRepository.findFullOrdersWithStatusCreatedOrConfirmed();
+        Set<String> customerLogins = findOrders.stream().map(o -> o.getCustomer().getLogin()).collect(Collectors.toSet());
+        CompletableFuture<Map<String, String>> accountNumbers = accountProvider.getAccountNumbers(customerLogins);
+        CompletableFuture<Map<String, String>> innByLogins = crmProvider.getInns(customerLogins);
+        System.out.println(accountNumbers.get(5, TimeUnit.SECONDS));
+        System.out.println(innByLogins.get(5, TimeUnit.SECONDS));
+        return null;
     }
 
     private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {

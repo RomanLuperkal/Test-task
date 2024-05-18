@@ -1,6 +1,7 @@
 package com.warehouse.myshop.order.controller;
 
 import com.warehouse.myshop.order.dto.CreateOrderDto;
+import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 import com.warehouse.myshop.order.dto.StatusDto;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -61,5 +63,10 @@ public class OrderController {
     public ResponseEntity<ResponseOrderDto> changeStatusOrder(@PathVariable UUID orderId,
                                                               @RequestBody @Valid StatusDto status) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(orderId, status));
+    }
+
+    @GetMapping("info")
+    public ResponseEntity<Map<UUID, List<OrderInfo>>> getOrdersInfo() {
+        return ResponseEntity.ok(orderService.getOrdersInfo());
     }
 }
