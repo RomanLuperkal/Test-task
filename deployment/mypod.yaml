@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demok8s #название пода, которое будет видно в kubectl get pods
+spec:
+  containers:
+    - name: demok8s #имя контейнера внутри пода, может быть несколько разных контейнеров внутри пода
+      image: romanluperkal/demok8s:v1 #название имейджа из докерхаба. кубер сам выкачает имейдж
+      ports:
+        - containerPort: 8000 #номер порта, открытый для контейнера, например тут нужно указать порт, на котором запущен томкат SpringBoot приложения
+          name: app
+        - containerPort: 9090 #еще один порт, открытый для контейнера. На этом порту отвечает актуатор Spring
+          name: actuator
+      env: #переменные среды для запуска контейнера, переменная используется SpringBoot приложением
+        - name: SPRING_PROFILES_ACTIVE
+          value: "local"
