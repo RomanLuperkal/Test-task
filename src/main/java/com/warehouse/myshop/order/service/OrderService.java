@@ -1,14 +1,12 @@
 package com.warehouse.myshop.order.service;
 
 import com.warehouse.myshop.order.dto.CreateOrderDto;
-import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.order.dto.ResponseFullOrderDto;
 import com.warehouse.myshop.order.dto.ResponseOrderDto;
 import com.warehouse.myshop.order.dto.StatusDto;
 import com.warehouse.myshop.product.dto.ShortProductDto;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public interface OrderService {
@@ -22,5 +20,5 @@ public interface OrderService {
 
     ResponseOrderDto changeStatusOrder(UUID orderId, StatusDto status);
 
-    Map<UUID, List<OrderInfo>> getOrdersInfo();
+
 }

@@ -1,16 +1,24 @@
 package com.warehouse.myshop.product.service;
 
+import com.warehouse.myshop.account.AccountProvider;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
+import com.warehouse.myshop.crm.CrmProvider;
 import com.warehouse.myshop.currency.ExchangeRateProvider;
-import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.currency.enums.Currency;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
+import com.warehouse.myshop.customer.dto.CustomerInfo;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
-import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
+import com.warehouse.myshop.handler.exceptions.ProductException;
+import com.warehouse.myshop.order.dto.OrderInfo;
+import com.warehouse.myshop.order.model.Order;
+import com.warehouse.myshop.orderedproduct.model.OrderedProduct;
+import com.warehouse.myshop.orderedproduct.repository.OrderedProductRepository;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
@@ -25,7 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -36,6 +48,9 @@ public class ProductServiceImpl implements ProductService {
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
     private final ExchangeRateProvider rateProvider;
+    private final OrderedProductRepository orderedProductRepository;
+    private final AccountProvider accountProvider;
+    private final CrmProvider crmProvider;
 
     @Override
     @Transactional
@@ -108,6 +123,45 @@ public class ProductServiceImpl implements ProductService {
                 .builder()
                 .products(products)
                 .build();
+    }
+
+    @Override
+    public Map<UUID, List<OrderInfo>> getProductsInfo() {
+        try {
+            Set<OrderedProduct> findOrderedProducts = orderedProductRepository.findFullOrderedProductsWithStatusCreatedOrConfirmed();
+            Set<String> customerLogins = findOrderedProducts.stream().map(op -> op.getOrder().getCustomer().getLogin()).collect(Collectors.toSet());
+            CompletableFuture<Map<String, String>> featureAccountNumbers = accountProvider.getAccountNumbers(customerLogins);
+            CompletableFuture<Map<String, String>> featureInn = crmProvider.getInns(customerLogins);
+            CompletableFuture<Map<UUID, List<OrderInfo>>> featureOrderInfo = featureAccountNumbers
+                    .thenCombine(featureInn, (accountNumbers, inn) -> findOrderedProducts.stream().collect(Collectors.groupingBy(
+                            orderedProduct -> orderedProduct.getProduct().getUuid(),
+                            Collectors.mapping(
+                                    orderedProduct -> {
+                                        Order order = orderedProduct.getOrder();
+                                        String login = order.getCustomer().getLogin();
+
+                                        CustomerInfo customerInfo = new CustomerInfo(
+                                                order.getCustomer().getId(),
+                                                accountNumbers.get(login),
+                                                order.getCustomer().getEmail(),
+                                                inn.get(login)
+                                        );
+
+                                        return new OrderInfo(
+                                                order.getId(),
+                                                customerInfo,
+                                                order.getStatus(),
+                                                order.getDeliveryAddress(),
+                                                orderedProduct.getQuantity()
+                                        );
+                                    },
+                                    Collectors.toList()
+                            )
+                    )));
+            return featureOrderInfo.get();
+        } catch (Exception e) {
+            throw new ProductException(e.getMessage());
+        }
     }
 
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {

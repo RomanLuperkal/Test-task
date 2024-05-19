@@ -1,6 +1,7 @@
 package com.warehouse.myshop.product.service;
 
 
+import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -9,6 +10,7 @@ import com.warehouse.myshop.product.dto.UpdateProductDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ProductService {
@@ -23,4 +25,6 @@ public interface ProductService {
     ListProductDto getProducts(Pageable pageable);
 
     ListProductDto searchProducts(List<FilterConditionDto<?>> conditions, Pageable pageable);
+
+    Map<UUID, List<OrderInfo>> getProductsInfo();
 }
