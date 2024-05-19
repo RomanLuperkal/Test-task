@@ -2,6 +2,7 @@ package com.warehouse.myshop.order.dto;
 
 import com.warehouse.myshop.customer.dto.CustomerInfo;
 import com.warehouse.myshop.order.enums.Status;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class OrderInfo {
     UUID id;
 

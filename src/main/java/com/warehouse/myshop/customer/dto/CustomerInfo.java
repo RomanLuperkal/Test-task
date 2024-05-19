@@ -1,14 +1,15 @@
 package com.warehouse.myshop.customer.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class CustomerInfo {
-    UUID id;
+    Long id;
 
     String accountNumber;
 

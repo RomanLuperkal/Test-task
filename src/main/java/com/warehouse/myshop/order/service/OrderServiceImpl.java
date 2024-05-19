@@ -2,6 +2,7 @@ package com.warehouse.myshop.order.service;
 
 import com.warehouse.myshop.account.AccountProvider;
 import com.warehouse.myshop.crm.CrmProvider;
+import com.warehouse.myshop.customer.dto.CustomerInfo;
 import com.warehouse.myshop.customer.model.Customer;
 import com.warehouse.myshop.customer.repository.CustomerRepository;
 import com.warehouse.myshop.handler.exceptions.AccessException;
@@ -34,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,13 +134,37 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @SneakyThrows
     public Map<UUID, List<OrderInfo>> getOrdersInfo() {
-        Set<Order> findOrders = orderRepository.findFullOrdersWithStatusCreatedOrConfirmed();
-        Set<String> customerLogins = findOrders.stream().map(o -> o.getCustomer().getLogin()).collect(Collectors.toSet());
-        CompletableFuture<Map<String, String>> accountNumbers = accountProvider.getAccountNumbers(customerLogins);
-        CompletableFuture<Map<String, String>> innByLogins = crmProvider.getInns(customerLogins);
-        System.out.println(accountNumbers.get(5, TimeUnit.SECONDS));
-        System.out.println(innByLogins.get(5, TimeUnit.SECONDS));
-        return null;
+        Set<OrderedProduct> findOrderedProducts = orderedProductRepository.findFullOrderedProductsWithStatusCreatedOrConfirmed();
+        Set<String> customerLogins = findOrderedProducts.stream().map(op -> op.getOrder().getCustomer().getLogin()).collect(Collectors.toSet());
+        CompletableFuture<Map<String, String>> featureAccountNumbers = accountProvider.getAccountNumbers(customerLogins);
+        CompletableFuture<Map<String, String>> featureInn = crmProvider.getInns(customerLogins);
+        CompletableFuture<Map<UUID, List<OrderInfo>>> featureOrderInfo = featureAccountNumbers
+                .thenCombine(featureInn, (accountNumbers, inn) -> findOrderedProducts.stream().collect(Collectors.groupingBy(
+                        orderedProduct -> orderedProduct.getProduct().getUuid(),
+                        Collectors.mapping(
+                                orderedProduct -> {
+                                    Order order = orderedProduct.getOrder();
+                                    String login = order.getCustomer().getLogin();
+
+                                    CustomerInfo customerInfo = new CustomerInfo(
+                                            order.getCustomer().getId(),
+                                            accountNumbers.get(login),
+                                            order.getCustomer().getEmail(),
+                                            inn.get(login)
+                                    );
+
+                                    return new OrderInfo(
+                                            order.getId(),
+                                            customerInfo,
+                                            order.getStatus(),
+                                            order.getDeliveryAddress(),
+                                            orderedProduct.getQuantity()
+                                    );
+                                },
+                                Collectors.toList()
+                        )
+                )));
+        return featureOrderInfo.get();
     }
 
     private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
