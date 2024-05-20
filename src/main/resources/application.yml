@@ -36,12 +36,17 @@ rest:
       get-currency: /currency
     mock:
       enabled: true
+
   account-service:
     host: http://localhost:8081
     methods:
       post-accountNumber: /account/accountNumber
+    mock:
+      enabled: true
   crm-service:
     host: http://localhost:8081
     methods:
       post-inn: /account/inn
+    mock:
+      enabled: true
 

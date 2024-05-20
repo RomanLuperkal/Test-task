@@ -1,19 +1,17 @@
-demok8s
-
 minikube start --vm-driver=virtualbox --no-vtx-check --memory 24000 --cpus=6
 
 ### Сборка имейджа:
 1. gradle build
 2. docker build .
 3. docker images
-4. docker tag <image_id> gurok/demok8s (можно сразу было "docker build -t gurok/demok8s .") 8cc851895894cls
+4. docker tag <image_id> romanluperkal/warehouse (можно сразу было "docker build -t gurok/demok8s .") 8cc851895894cls
 5. docker login -u <user> -p <password>
 6. docker push gurok/demok8s
 
 ### Для создания имейджа другой версии приложения:
 1. gradle build
-2. docker build -t gurok/demok8s:v3 .
-3. docker push gurok/demok8s:v2
+2. docker build -t romanluperkal/warehouse:v3 .
+3. docker push romanluperkal/warehouse:v2
    docker run -p 8080:8080 -d image
 
 Запуск докер контейнера с env переменными
