@@ -4,8 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <include file="v.1.0.0/sequences/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v.1.0.0/tables/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v.1.0.0/changes/2024.5/changelog.xml" relativeToChangelogFile="true"/>
+    <changeSet id="create-customer_seq" author="Roman">
+        <createSequence sequenceName="customer_seq" incrementBy="1" startValue="1"/>
+    </changeSet>
 
 </databaseChangeLog>

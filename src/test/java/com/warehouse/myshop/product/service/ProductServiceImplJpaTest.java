@@ -2,7 +2,7 @@ package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.mapper.CategoryMapperImpl;
 import com.warehouse.myshop.product.ProductTestBase;
-import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.condition.DateFilterConditionDto;
 import com.warehouse.myshop.product.dto.condition.NumericFilterConditionDto;

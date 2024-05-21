@@ -1,7 +1,7 @@
 package com.warehouse.myshop.currency.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.warehouse.myshop.enums.Currency;
+import com.warehouse.myshop.currency.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

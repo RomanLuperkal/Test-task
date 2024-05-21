@@ -23,7 +23,7 @@ public class Product {
     @Column(nullable = false, name = "article_number", unique = true)
     private String articleNumber;
     private String description;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
     @Column(nullable = false)
@@ -32,6 +32,8 @@ public class Product {
     private Integer quantity;
     @Embedded
     private ProductAudit productAudit = new ProductAudit();
+    @Column(nullable = false, name = "is_available")
+    private Boolean isAvailable = false;
 
     @Override
     public boolean equals(Object o) {

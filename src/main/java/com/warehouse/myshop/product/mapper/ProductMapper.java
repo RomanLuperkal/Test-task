@@ -1,7 +1,7 @@
 package com.warehouse.myshop.product.mapper;
 
 import com.warehouse.myshop.category.mapper.CategoryMapper;
-import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;

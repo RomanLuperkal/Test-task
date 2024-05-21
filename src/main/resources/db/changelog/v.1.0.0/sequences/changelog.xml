@@ -8,6 +8,7 @@
         <tagDatabase tag="v.1.0.0"/>
     </changeSet>
 
-    <include file="create-seq-category_seq.xml" relativeToChangelogFile="true"/>
+    <include file="category_seq_create.xml" relativeToChangelogFile="true"/>
+    <include file="customer_seq_create.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -1,6 +1,6 @@
 package com.warehouse.myshop.currency.session;
 
-import com.warehouse.myshop.enums.Currency;
+import com.warehouse.myshop.currency.enums.Currency;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;

@@ -4,8 +4,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <include file="v.1.0.0/sequences/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v.1.0.0/tables/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v.1.0.0/changes/2024.5/changelog.xml" relativeToChangelogFile="true"/>
+    <changeSet id="add_is_available_column" author="Roman">
+        <addColumn tableName="product">
+            <column name="is_available" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

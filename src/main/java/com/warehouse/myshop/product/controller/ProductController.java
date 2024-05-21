@@ -1,6 +1,6 @@
 package com.warehouse.myshop.product.controller;
 
-import com.warehouse.myshop.product.dto.FilterConditionDto;
+import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
@@ -84,6 +84,7 @@ public class ProductController {
     @PostMapping("search")
     public ResponseEntity<ListProductDto> searchProducts(@RequestBody @Valid List<FilterConditionDto<?>> conditions,
                                                          Pageable pageable) {
+        log.info("Получение товаров по условиям");
         return ResponseEntity.ok(productService.searchProducts(conditions, pageable));
     }
 }
