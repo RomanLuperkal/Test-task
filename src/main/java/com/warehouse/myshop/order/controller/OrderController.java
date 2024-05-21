@@ -65,7 +65,7 @@ public class OrderController {
                              @RequestHeader("customerId") @Min(1) Long customerId) {
     }
 
-    @PatchMapping("{orderId}/status")
+    @PatchMapping ("{orderId}/status")
     public ResponseEntity<ResponseOrderDto> changeStatusOrder(@PathVariable UUID orderId,
                                                               @RequestBody @Valid StatusDto status) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(orderId, status));

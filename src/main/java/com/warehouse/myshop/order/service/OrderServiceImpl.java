@@ -40,7 +40,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderedProductRepository orderedProductRepository;
     private final OrderMapper mapper;
 
-
     @Override
     @Transactional
     public ResponseOrderDto createOrder(CreateOrderDto orderDto, Long customerId) {
@@ -123,7 +122,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(status.getStatus());
         return mapper.mapToResponseOrderDto(order);
     }
-
 
     private int calculateQuantity(Integer actualQuantity, Integer orderingQuantity) {
         int totalQuantity = actualQuantity - orderingQuantity;

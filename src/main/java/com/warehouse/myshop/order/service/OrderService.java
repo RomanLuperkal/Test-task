@@ -19,6 +19,4 @@ public interface OrderService {
     void deleteOrder(UUID orderId, Long customerId);
 
     ResponseOrderDto changeStatusOrder(UUID orderId, StatusDto status);
-
-
 }
