@@ -28,6 +28,8 @@ app:
     priceIncrease: 10.1
     optimization: true
     exclusive-lock: false
+  kafka:
+    enabled: true
 
 rest:
   currency-service:
@@ -36,4 +38,8 @@ rest:
       get-currency: /currency
     mock:
       enabled: true
+
+kafka:
+  bootstrapAddress: localhost:9091
+  groupId: group1
 

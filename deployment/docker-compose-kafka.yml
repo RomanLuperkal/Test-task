@@ -41,12 +41,12 @@ services:
       - "9091:9091"
       - "9101:9101"
 
-  kafka-manager:
-    image: hlebalbau/kafka-manager:latest
-    container_name: kafka-manager
+  cmak:
+    image: ghcr.io/eshepelyuk/dckr/cmak-3.0.0.5:latest
+    ports:
+      - "9000:9000" #http://localhost:9000
     environment:
       ZK_HOSTS: "zookeeper:2181"
-    ports:
-      - "9000:9000"
     depends_on:
+      - zookeeper
       - kafka
