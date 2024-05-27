@@ -23,7 +23,7 @@ public class ConsumerConfig {
     @Value("${kafka.groupId}")
     private String groupId;
 
-    private ConsumerFactory<String, String> consumerFactoryString() {
+    private ConsumerFactory<String, byte[]> consumerFactoryByte() {
         Map<String, Object> props = new HashMap<>();
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, SERVER);
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -34,10 +34,10 @@ public class ConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryString() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactoryByte() {
+        ConcurrentKafkaListenerContainerFactory<String, byte[]> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactoryString());
+        factory.setConsumerFactory(consumerFactoryByte());
         return factory;
     }
 }
