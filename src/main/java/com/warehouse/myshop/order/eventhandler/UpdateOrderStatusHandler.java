@@ -5,8 +5,10 @@ import com.warehouse.myshop.order.enums.OrderEvent;
 import com.warehouse.myshop.order.event.UpdateOrderStatusEvent;
 import com.warehouse.myshop.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 public class UpdateOrderStatusHandler implements OrderEventHandler<UpdateOrderStatusEvent> {
     private final OrderService orderService;
 

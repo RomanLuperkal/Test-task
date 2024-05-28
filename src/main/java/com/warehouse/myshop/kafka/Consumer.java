@@ -1,6 +1,8 @@
 package com.warehouse.myshop.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.warehouse.myshop.handler.exceptions.AccessException;
+import com.warehouse.myshop.handler.exceptions.OrderException;
 import com.warehouse.myshop.order.eventhandler.OrderEventHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Set;
 
 @Slf4j
@@ -28,25 +31,12 @@ public class Consumer {
             System.out.println(kafkaOrderEvent);
 
             eventHandlers.stream().filter(eventHandler -> eventHandler.canHandle(kafkaOrderEvent)).findFirst()
-                    .orElseThrow(() -> new RuntimeException("Handler for eventsource not found"))
+                    .orElseThrow(() -> new RuntimeException("Обработчик для события не найден"))
                     .handleEvent(kafkaOrderEvent);
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Couldn't parse message: {}; exception: ", message, e);
+        } catch (OrderException | AccessException e2) {
+            log.error(e2.getMessage());
         }
-
-
-        /*try {
-            final KafkaEvent eventSource = objectMapper.readValue(message, KafkaEvent.class);
-            log.info("EventSource: {}", eventSource);
-
-            eventHandlers.stream()
-                    .filter(eventSourceEventHandler -> eventSourceEventHandler.canHandle(eventSource))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Handler for eventsource not found"))
-                    .handleEvent(eventSource);
-
-        } catch (JsonProcessingException e) {
-            log.error("Couldn't parse message: {}; exception: ", message, e);
-        }*/
     }
 }
