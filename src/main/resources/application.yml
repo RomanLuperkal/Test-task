@@ -40,6 +40,6 @@ rest:
       enabled: true
 
 kafka:
-  bootstrapAddress: localhost:9091
+  bootstrapAddress: kafka:9094
   groupId: group1
 
