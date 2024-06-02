@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @RequiredArgsConstructor
 public class CrmServiceClientImpl implements CrmServiceClient {
-    @Qualifier("CrmServiceWebClient")
+    @Qualifier("crmServiceWebClient")
     private final WebClient webClient;
     private final CrmServiceProperties crmServiceProperties;
 

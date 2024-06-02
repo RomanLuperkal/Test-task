@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
 
-    @Qualifier("CurrencyServiceWebClient")
+    @Qualifier("currencyServiceWebClient")
     private final WebClient webClient;
     private final CurrencyServiceProperties currencyServiceProperties;
 

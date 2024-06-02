@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class AccountServiceClientImpl implements AccountServiceClient {
 
-    @Qualifier("AccountServiceWebClient")
+    @Qualifier("accountServiceWebClient")
     private final WebClient webClient;
     private final AccountServiceProperties accountServiceProperties;
 

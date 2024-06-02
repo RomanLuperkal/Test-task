@@ -12,18 +12,18 @@ public class WebClientConfiguration {
     private final AccountServiceProperties accountServiceProperties;
     private final CrmServiceProperties crmServiceProperties;
 
-    @Bean(name = "CurrencyServiceWebClient")
-    public WebClient getWebClientForCurrencyService() {
+    @Bean()
+    public WebClient currencyServiceWebClient() {
         return WebClient.builder().baseUrl(currencyServiceProperties.getHost()).build();
     }
 
-    @Bean(name = "AccountServiceWebClient")
-    public WebClient getWebClientForAccountService() {
+    @Bean()
+    public WebClient accountServiceWebClient() {
         return WebClient.builder().baseUrl(accountServiceProperties.getHost()).build();
     }
 
-    @Bean(name = "CrmServiceWebClient")
-    public WebClient getWebClientForCrmService() {
+    @Bean()
+    public WebClient crmServiceWebClient() {
         return WebClient.builder().baseUrl(crmServiceProperties.getHost()).build();
     }
 }
