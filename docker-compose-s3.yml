@@ -11,3 +11,7 @@ services:
       - "4572:4572" #Edge port
       - "4574:4574" #Edge port
       - "8083:8080" #Edge port
+    environment:
+      - AWS_ACCESS_KEY_ID= test
+      - AWS_SECRET_ACCESS_KEY= test
+      - AWS_REGION= us-east-1

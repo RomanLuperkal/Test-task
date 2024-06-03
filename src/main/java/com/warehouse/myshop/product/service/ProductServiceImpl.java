@@ -1,7 +1,10 @@
 package com.warehouse.myshop.product.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
+import com.warehouse.myshop.configuration.S3Properties;
 import com.warehouse.myshop.currency.ExchangeRateProvider;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.currency.enums.Currency;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,6 +40,8 @@ public class ProductServiceImpl implements ProductService {
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
     private final ExchangeRateProvider rateProvider;
+    private final AmazonS3 s3Client;
+    private final S3Properties s3Properties;
 
     @Override
     @Transactional
@@ -108,6 +114,21 @@ public class ProductServiceImpl implements ProductService {
                 .builder()
                 .products(products)
                 .build();
+    }
+
+    @Override
+    public void uploadImage(UUID productId, MultipartFile file)  {
+        try {
+            String key = "images/"  + file.getOriginalFilename();
+
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(file.getSize());
+            metadata.setContentType(file.getContentType());
+
+            s3Client.putObject(s3Properties.getBucket(), key, file.getInputStream(), metadata);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {

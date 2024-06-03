@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.Valid;
@@ -86,5 +87,13 @@ public class ProductController {
                                                          Pageable pageable) {
         log.info("Получение товаров по условиям");
         return ResponseEntity.ok(productService.searchProducts(conditions, pageable));
+    }
+
+    @PostMapping("{productId}/images/upload")
+    public ResponseEntity<Void> uploadImage(@PathVariable UUID productId, @RequestParam() MultipartFile file) {
+        log.info("загрузка изображения");
+        productService.uploadImage(productId, file);
+        log.info("загрузка завершена");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
