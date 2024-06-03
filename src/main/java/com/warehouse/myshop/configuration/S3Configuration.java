@@ -21,11 +21,12 @@ public class S3Configuration {
         return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(
                         new com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration(
-                                "https://s3.localhost.localstack.cloud:4566",
+                                "http://localhost:4566",
                                 s3Properties.getRegion()
                         )
                 )
                 //.withRegion(s3Properties.getRegion())
+                .withPathStyleAccessEnabled(true)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .build();
     }

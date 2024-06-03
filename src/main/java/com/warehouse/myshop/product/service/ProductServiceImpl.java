@@ -119,13 +119,22 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void uploadImage(UUID productId, MultipartFile file)  {
         try {
-            String key = "images/"  + file.getOriginalFilename();
+            String bucketName = s3Properties.getBucket();
+            if (!s3Client.doesBucketExistV2(bucketName)) {
+                s3Client.createBucket(bucketName);
+            }
+
+            String key = "images/" + file.getOriginalFilename();
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
 
-            s3Client.putObject(s3Properties.getBucket(), key, file.getInputStream(), metadata);
+            // Загрузка файла в S3
+            s3Client.putObject(bucketName, key, file.getInputStream(), metadata);
+
+            // Логирование для проверки
+            System.out.println("File uploaded to S3: " + key);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
