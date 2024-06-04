@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,4 +26,7 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, U
     Boolean isExistsProducts(@Param("uuids") Set<UUID> uuids, @Param("size") Long size);
 
     List<Product> findAllByUuidIn(Set<UUID> ids);
+
+    @Query("SELECT p FROM Product p JOIN FETCH p.images WHERE p.uuid = :uuid")
+    Optional<Product> getProductWithImages(@Param("uuid") UUID uuid);
 }

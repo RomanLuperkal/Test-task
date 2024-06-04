@@ -1,7 +1,10 @@
 package com.warehouse.myshop.product.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.configuration.S3Properties;
@@ -17,6 +20,8 @@ import com.warehouse.myshop.product.dto.UpdateProductDto;
 import com.warehouse.myshop.product.mapper.ProductMapper;
 import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
+import com.warehouse.myshop.productimage.model.Image;
+import com.warehouse.myshop.productimage.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -37,6 +45,7 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
     private final ExchangeRateProvider rateProvider;
@@ -117,24 +126,36 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void uploadImage(UUID productId, MultipartFile file)  {
         try {
-            String bucketName = s3Properties.getBucket();
-            if (!s3Client.doesBucketExistV2(bucketName)) {
-                s3Client.createBucket(bucketName);
-            }
-
-            String key = "images/" + file.getOriginalFilename();
+            Product product = productRepository.getProductWithImages(productId)
+                    .orElseThrow(() -> new NotFoundException("Товара с UUID=" + productId + " не существует"));
+            final String originalName = file.getOriginalFilename();
+            String newFileName = originalName.substring(0, originalName.length() - 4);
+            long duplicateNames = product.getImages().stream().filter(i -> i.getImageName()
+                    .contains(file.getOriginalFilename())).count();
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
+            Image image = new Image();
+            image.setProduct(product);
+            if (duplicateNames > 0) {
+                newFileName = newFileName + "(" + duplicateNames + ")." + originalName
+                        .substring(originalName.length() - 4);
+                image.setImageName(newFileName);
+                Image savedImage = imageRepository.save(image);
+                metadata.addUserMetadata(savedImage.getImageUuid().toString(), newFileName);
 
-            // Загрузка файла в S3
-            s3Client.putObject(bucketName, key, file.getInputStream(), metadata);
+            } else {
+                image.setImageName(originalName);
+                Image savedImage = imageRepository.save(image);
+                metadata.addUserMetadata(savedImage.toString(), originalName);
+            }
+            String bucketName = s3Properties.getBucket();
+                s3Client.putObject(bucketName, UUID.randomUUID().toString(), file.getInputStream(), metadata);
 
-            // Логирование для проверки
-            System.out.println("File uploaded to S3: " + key);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -147,5 +168,16 @@ public class ProductServiceImpl implements ProductService {
 
     private void setCurrencyInProducts(List<ResponseProductDto> products, Currency currency) {
         products.forEach(p -> p.setCurrency(currency));
+    }
+
+    private String addCounterToFilename(String filename, int counter) {
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex != -1) {
+            String name = filename.substring(0, dotIndex);
+            String extension = filename.substring(dotIndex);
+            return name + "(" + counter + ")" + extension;
+        } else {
+            return filename + "(" + counter + ")";
+        }
     }
 }
