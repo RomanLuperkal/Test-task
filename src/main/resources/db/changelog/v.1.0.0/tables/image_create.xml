@@ -16,12 +16,15 @@
                              foreignKeyName="fk_product" referencedTableName="product"
                              referencedColumnNames="uuid" deleteCascade="false"/>
             </column>
-            <column name="image_name" type="VARCHAR">
+            <column name="original_name" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="new_name" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <addUniqueConstraint tableName="image"
-                             columnNames="product_uuid, image_name"
+                             columnNames="product_uuid, new_name"
                              constraintName="unique_product_image"/>
     </changeSet>
 </databaseChangeLog>

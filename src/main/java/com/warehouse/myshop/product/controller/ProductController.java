@@ -10,8 +10,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -95,5 +98,14 @@ public class ProductController {
         productService.uploadImage(productId, file);
         log.info("загрузка завершена");
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("{productId}/images/download")
+    public ResponseEntity<InputStreamResource> downloadImages(@PathVariable UUID productId) {
+        log.info("скачивание изображений");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=product-" + productId + ".zip");
+        headers.add("Content-Type", "application/zip");
+        return new ResponseEntity<>(productService.downloadImages(productId), headers, HttpStatus.OK);
     }
 }

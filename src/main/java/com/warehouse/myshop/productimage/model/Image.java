@@ -28,8 +28,11 @@ public class Image {
     @JoinColumn(name = "product_uuid")
     private Product product;
 
-    @Column(name = "image_name")
-    private String imageName;
+    @Column(name = "original_name")
+    private String originalName;
+
+    @Column(name = "new_name")
+    private String newName;
 
     @Override
     public boolean equals(Object o) {

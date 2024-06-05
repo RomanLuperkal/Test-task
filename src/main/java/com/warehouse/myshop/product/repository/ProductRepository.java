@@ -27,6 +27,6 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, U
 
     List<Product> findAllByUuidIn(Set<UUID> ids);
 
-    @Query("SELECT p FROM Product p JOIN FETCH p.images WHERE p.uuid = :uuid")
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.uuid = :uuid")
     Optional<Product> getProductWithImages(@Param("uuid") UUID uuid);
 }

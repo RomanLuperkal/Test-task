@@ -1,10 +1,9 @@
 package com.warehouse.myshop.product.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.configuration.S3Properties;
@@ -25,19 +24,22 @@ import com.warehouse.myshop.productimage.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -128,36 +130,84 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void uploadImage(UUID productId, MultipartFile file)  {
-        try {
             Product product = productRepository.getProductWithImages(productId)
                     .orElseThrow(() -> new NotFoundException("Товара с UUID=" + productId + " не существует"));
             final String originalName = file.getOriginalFilename();
-            String newFileName = originalName.substring(0, originalName.length() - 4);
-            long duplicateNames = product.getImages().stream().filter(i -> i.getImageName()
-                    .contains(file.getOriginalFilename())).count();
+            String baseName = originalName.substring(0, originalName.lastIndexOf('.'));
+            String extension = originalName.substring(originalName.lastIndexOf('.'));
+            long duplicateNames = product.getImages().stream()
+                    .filter(i -> i.getOriginalName().equals(originalName))
+                    .count();
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
+
+            String newFileName;
+            if (duplicateNames > 0) {
+                newFileName = baseName + "(" + duplicateNames + ")" + extension;
+            } else {
+                newFileName = originalName;
+            }
+
             Image image = new Image();
             image.setProduct(product);
-            if (duplicateNames > 0) {
-                newFileName = newFileName + "(" + duplicateNames + ")." + originalName
-                        .substring(originalName.length() - 4);
-                image.setImageName(newFileName);
-                Image savedImage = imageRepository.save(image);
-                metadata.addUserMetadata(savedImage.getImageUuid().toString(), newFileName);
+            image.setOriginalName(originalName);
+            image.setNewName(newFileName);
+            Image savedImage = imageRepository.save(image);
 
-            } else {
-                image.setImageName(originalName);
-                Image savedImage = imageRepository.save(image);
-                metadata.addUserMetadata(savedImage.toString(), originalName);
-            }
             String bucketName = s3Properties.getBucket();
-                s3Client.putObject(bucketName, UUID.randomUUID().toString(), file.getInputStream(), metadata);
+            try {
+                s3Client.putObject(bucketName, savedImage.getImageUuid().toString(), file.getInputStream(), metadata);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+    }
+
+    @Override
+    public InputStreamResource downloadImages(UUID productId) {
+        try {
+            Product product = productRepository.getProductWithImages(productId)
+                    .orElseThrow(() -> new NotFoundException("Товара с UUID=" + productId + " не существует"));
+            //todo проверка наличия файлов
+            Set<Image> images = product.getImages();
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            try (ZipOutputStream zipOut = new ZipOutputStream(byteArrayOutputStream)) {
+                String bucketName = s3Properties.getBucket();
+
+                for (Image image : images) {
+                    String fileKey = image.getImageUuid().toString();
+                    S3Object s3Object = s3Client.getObject(bucketName, fileKey);
+                    S3ObjectInputStream inputStream = s3Object.getObjectContent();
+
+                    // Генерируем имя файла с учетом возможных дубликатов
+
+
+                    // Добавляем новый файл в zip-архив
+                    zipOut.putNextEntry(new ZipEntry(image.getNewName()));
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = inputStream.read(buffer)) > 0) {
+                        zipOut.write(buffer, 0, length);
+                    }
+
+                    // Закрываем текущую запись zip-архива
+                    zipOut.closeEntry();
+                    inputStream.close();
+                }
+            }
+
+            // Подготовка данных для ResponseEntity
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+            return resource;
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка при загрузке файлов", e);
         }
     }
 
@@ -170,14 +220,4 @@ public class ProductServiceImpl implements ProductService {
         products.forEach(p -> p.setCurrency(currency));
     }
 
-    private String addCounterToFilename(String filename, int counter) {
-        int dotIndex = filename.lastIndexOf('.');
-        if (dotIndex != -1) {
-            String name = filename.substring(0, dotIndex);
-            String extension = filename.substring(dotIndex);
-            return name + "(" + counter + ")" + extension;
-        } else {
-            return filename + "(" + counter + ")";
-        }
-    }
 }
