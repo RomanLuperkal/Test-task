@@ -21,6 +21,11 @@ spring:
     caffeine:
       spec: expireAfterAccess=1m
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 app:
   scheduling:
     enabled: false
@@ -37,3 +42,8 @@ rest:
     mock:
       enabled: true
 
+aws:
+  accessKeyId: test
+  secretAccessKey: test
+  region: us-east-1
+  bucket: new-bucket1

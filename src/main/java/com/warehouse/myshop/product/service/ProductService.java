@@ -1,12 +1,15 @@
 package com.warehouse.myshop.product.service;
 
 
-import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
 import com.warehouse.myshop.product.dto.UpdateProductDto;
+import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,4 +26,8 @@ public interface ProductService {
     ListProductDto getProducts(Pageable pageable);
 
     ListProductDto searchProducts(List<FilterConditionDto<?>> conditions, Pageable pageable);
+
+    void uploadImage(UUID productId, MultipartFile file);
+
+    InputStreamResource downloadImages(UUID productId);
 }
