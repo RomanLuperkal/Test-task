@@ -11,6 +11,7 @@ import com.warehouse.myshop.currency.ExchangeRateProvider;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.currency.enums.Currency;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
+import com.warehouse.myshop.handler.exceptions.ProductException;
 import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -168,11 +169,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public InputStreamResource downloadImages(UUID productId) {
-        try {
             Product product = productRepository.getProductWithImages(productId)
                     .orElseThrow(() -> new NotFoundException("Товара с UUID=" + productId + " не существует"));
-            //todo проверка наличия файлов
             Set<Image> images = product.getImages();
+            if (images.isEmpty())
+                throw new ProductException("У данного товара отсутсвуют картинки");
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -184,31 +185,20 @@ public class ProductServiceImpl implements ProductService {
                     S3Object s3Object = s3Client.getObject(bucketName, fileKey);
                     S3ObjectInputStream inputStream = s3Object.getObjectContent();
 
-                    // Генерируем имя файла с учетом возможных дубликатов
-
-
-                    // Добавляем новый файл в zip-архив
                     zipOut.putNextEntry(new ZipEntry(image.getNewName()));
                     byte[] buffer = new byte[1024];
                     int length;
                     while ((length = inputStream.read(buffer)) > 0) {
                         zipOut.write(buffer, 0, length);
                     }
-
-                    // Закрываем текущую запись zip-архива
                     zipOut.closeEntry();
                     inputStream.close();
                 }
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                return new InputStreamResource(byteArrayInputStream);
+            } catch (Exception e) {
+                throw new RuntimeException("Ошибка при загрузке файлов", e);
             }
-
-            // Подготовка данных для ResponseEntity
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
-            return resource;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при загрузке файлов", e);
-        }
     }
 
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
