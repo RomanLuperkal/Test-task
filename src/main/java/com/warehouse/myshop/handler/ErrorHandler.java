@@ -4,6 +4,7 @@ import com.warehouse.myshop.handler.exceptions.AccessException;
 import com.warehouse.myshop.handler.exceptions.InvalidOperationException;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.handler.exceptions.OrderException;
+import com.warehouse.myshop.handler.exceptions.ProductException;
 import com.warehouse.myshop.handler.responce.ApiError;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -107,5 +108,16 @@ public class ErrorHandler {
                 .time(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(ProductException.class)
+    private ResponseEntity<ApiError> handleException(ProductException e) {
+        ApiError errorResponse = ApiError.builder()
+                .message(e.getMessage())
+                .reason("Ошибка при взаимодействии с товаром")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .time(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

@@ -1,29 +1,34 @@
-package com.warehouse.myshop.currency.client;
+package com.warehouse.myshop.account.client;
 
-import com.warehouse.myshop.configuration.CurrencyServiceProperties;
-import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
+import com.warehouse.myshop.configuration.AccountServiceProperties;
 import com.warehouse.myshop.handler.exceptions.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
 @Component
-@Slf4j
 @RequiredArgsConstructor
-public class CurrencyServiceClientImpl implements CurrencyServiceClient {
+@Slf4j
+public class AccountServiceClientImpl implements AccountServiceClient {
 
-    @Qualifier("currencyServiceWebClient")
+    @Qualifier("accountServiceWebClient")
     private final WebClient webClient;
-    private final CurrencyServiceProperties currencyServiceProperties;
+    private final AccountServiceProperties accountServiceProperties;
 
-    private ResponseCurrencyDto performGetRequest() {
-        return this.webClient.get()
-                .uri(currencyServiceProperties.getMethods().get("get-currency"))
+    @Override
+    public CompletableFuture<Map<String, String>> getAccountNumbers(Set<String> logins) {
+        return this.webClient.post()
+                .uri(accountServiceProperties.getMethods().get("post-accountNumber"))
+                .body(Mono.just(logins), new ParameterizedTypeReference<>() {})
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse ->
                         Mono.error(new ResponseStatusException("Ошибка отправки get запроса в currency service со статусом: "
@@ -31,15 +36,8 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
                 .onStatus(HttpStatus::is5xxServerError, clientResponse ->
                         Mono.error(new ResponseStatusException("Ошибка отправки get запроса в currency service со статусом: "
                                 + clientResponse.statusCode())))
-                .bodyToMono(ResponseCurrencyDto.class)
-                .retry(2)
-                .block();
-    }
-
-    @Override
-    @Cacheable(value = "currencies", unless = "#result == null")
-    public ResponseCurrencyDto getCurrenciesRate() {
-        log.info("Получение курса валют");
-        return performGetRequest();
+                .bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {
+                })
+                .toFuture();
     }
 }
