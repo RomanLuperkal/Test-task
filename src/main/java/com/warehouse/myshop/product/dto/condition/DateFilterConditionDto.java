@@ -25,7 +25,10 @@ public class DateFilterConditionDto extends FilterConditionDto<LocalDateTime> {
         switch (this.operation) {
             case EQUALS:
             case LIKE:
-                return (root, query, cb) -> cb.equal(root.get("productAudit").get(this.field).as(LocalDate.class), this.value.toLocalDate());
+                LocalDate date = this.value.toLocalDate();
+                LocalDateTime startOfDay = date.atStartOfDay();
+                LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+                return (root, query, cb) -> cb.between(root.get("productAudit").get(this.field), startOfDay, endOfDay);
             case GREATER_THAN_OR_EQUALS:
                 return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("productAudit").get(this.field), this.value);
             case LESS_THAN_OR_EQUALS:

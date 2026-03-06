@@ -1,6 +1,9 @@
 package com.warehouse.myshop.product.service;
 
 import com.warehouse.myshop.category.mapper.CategoryMapperImpl;
+import com.warehouse.myshop.currency.ExchangeRateProvider;
+import com.warehouse.myshop.currency.enums.Currency;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.product.ProductTestBase;
 import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
@@ -18,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockReset;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
@@ -26,6 +31,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -35,6 +41,16 @@ public class ProductServiceImplJpaTest extends ProductTestBase {
     @Autowired
     private ProductService productService;
     private List<FilterConditionDto<?>> conditions;
+    @MockitoBean(reset = MockReset.AFTER)
+    private CurrencyProvider currencyProvider;
+    @MockitoBean(reset = MockReset.AFTER)
+    private ExchangeRateProvider rateProvider;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        when(currencyProvider.getCurrency()).thenReturn(Currency.RUB);
+        when(rateProvider.getExchangeRate(Currency.RUB)).thenReturn(BigDecimal.ONE);
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"=", "EQUALS", "LIKE", "~"})

@@ -2,7 +2,7 @@ package com.warehouse.myshop.product.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Builder

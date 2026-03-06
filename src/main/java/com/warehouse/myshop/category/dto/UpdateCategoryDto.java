@@ -1,10 +1,12 @@
 package com.warehouse.myshop.category.dto;
 
-import lombok.*;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Builder
 @Setter

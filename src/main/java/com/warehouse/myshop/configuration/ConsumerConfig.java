@@ -1,4 +1,4 @@
-package com.warehouse.myshop.kafka.config;
+package com.warehouse.myshop.configuration;
 
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;

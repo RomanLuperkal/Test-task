@@ -22,7 +22,7 @@ public class Consumer {
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "test_topic", containerFactory = "kafkaListenerContainerFactoryByte")
-    public void listenGroupTopic2(byte[] message) {
+    public void listenGroupTopic(byte[] message) {
         log.info("Получено сообщение: {}", message);
 
         try {

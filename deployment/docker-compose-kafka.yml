@@ -1,52 +1,55 @@
 version: '2.4'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.1.1
-    container_name: zookeeper-jboot
-    healthcheck: #проверка состояния контейнера
-      test: "[[ $$(echo srvr | nc localhost 2181 | grep -oG 'Mode: standalone') = \"Mode: standalone\" ]]" #команда с проверкой, что зукипер работает в режиме standalone
-      interval: 10s #интервал проверки 10с
-      timeout: 1s #время ожидания ответа 1с
-      retries: 30 #количество попыток
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181 #порт клиента Zookeeper
-      ZOOKEEPER_TICK_TIME: 2000 #Время тика Zookeeper
-    ports:
-      - "2181:2181"
-
   kafka:
-    image: confluentinc/cp-kafka:6.1.1
-    container_name: kafka-jboot
-    depends_on:
-      zookeeper:
-        condition: service_healthy #проверка что zookeper прошел проверку состояния
-    healthcheck:
-      test: "test $$( /usr/bin/zookeeper-shell zookeeper:2181 get /brokers/ids/1 | grep { ) != ''" #Команда которая проверяет что в zookeper есть брокер с индификатором 1
-      interval: 3s
-      timeout: 2s
-      retries: 300
-    environment:
-      KAFKA_BROKER_ID: 1 #индификатор брокера
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181' #адрес подключения к zookeper
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT #сопоставление протоколов безопастности для листениров PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9091 # рекламируемые слушатели
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 #фактор репликации топика смещений
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1 #Минимальное кол-во реплик для журнала транзакций
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1 #Фактор репликации журнала транзакций
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 #Задержка перед началом ребалансировки группы
-      KAFKA_JMX_PORT: 9101 #Порт JMX
-      KAFKA_JMX_HOSTNAME: localhost #Хост JMX
+    image: confluentinc/cp-kafka:7.7.0
+    hostname: kafka
+    container_name: kafka
     ports:
-      - "9092:9092"
       - "9091:9091"
-      - "9101:9101"
-
-  cmak:
-    image: ghcr.io/eshepelyuk/dckr/cmak-3.0.0.5:latest
-    ports:
-      - "9000:9000" #http://localhost:9000
+      - "9093:9093"
     environment:
-      ZK_HOSTS: "zookeeper:2181"
-    depends_on:
-      - zookeeper
-      - kafka
+      KAFKA_NODE_ID: 1
+      CLUSTER_ID: "kafka-cluster-1"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+
+      # Добавим CLIENT в listeners
+      KAFKA_LISTENERS: "BROKER://0.0.0.0:9094,CLIENT://0.0.0.0:9091,CONTROLLER://0.0.0.0:9093"
+
+      # Теперь BROKER — для Docker, CLIENT — для внешних клиентов (с хоста)
+      KAFKA_ADVERTISED_LISTENERS: "BROKER://kafka:9094,CLIENT://localhost:9091"
+
+      # Соответствие протоколов: BROKER и CLIENT — PLAINTEXT, CONTROLLER — внутренний
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "BROKER:PLAINTEXT,CLIENT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+
+      # Внутри кластера брокеры общаются через BROKER
+      KAFKA_INTER_BROKER_LISTENER_NAME: "BROKER"
+
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - kafka-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "7071:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9094
+    networks:
+      - kafka-net
+
+volumes:
+  kafka_data:
+
+networks:
+  kafka-net:
+    driver: bridge

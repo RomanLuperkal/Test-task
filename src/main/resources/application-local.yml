@@ -19,3 +19,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
     enabled: false
+
+app:
+  kafka:
+    enabled: false
