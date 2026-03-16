@@ -29,7 +29,9 @@ app:
     optimization: true
     exclusive-lock: false
   kafka:
-    enabled: true
+    enabled: {$KAFKA_ENABLED:false}
+    bootstrapAddress: kafka:9094
+    groupId: group1
 
 rest:
   currency-service:
@@ -39,7 +41,4 @@ rest:
     mock:
       enabled: true
 
-kafka:
-  bootstrapAddress: kafka:9094
-  groupId: group1
 

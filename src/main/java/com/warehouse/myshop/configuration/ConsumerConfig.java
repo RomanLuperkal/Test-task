@@ -18,9 +18,9 @@ import java.util.Map;
 @Configuration
 @ConditionalOnProperty(prefix = "app", name = "kafka.enabled")
 public class ConsumerConfig {
-    @Value("${kafka.bootstrapAddress}")
+    @Value("${app.kafka.bootstrapAddress}")
     private String SERVER;
-    @Value("${kafka.groupId}")
+    @Value("${app.kafka.groupId}")
     private String groupId;
 
     private ConsumerFactory<String, byte[]> consumerFactoryByte() {
