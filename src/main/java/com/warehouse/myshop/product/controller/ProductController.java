@@ -1,5 +1,6 @@
 package com.warehouse.myshop.product.controller;
 
+import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.product.dto.condition.FilterConditionDto;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -86,5 +88,11 @@ public class ProductController {
                                                          Pageable pageable) {
         log.info("Получение товаров по условиям");
         return ResponseEntity.ok(productService.searchProducts(conditions, pageable));
+    }
+
+    @GetMapping("info")
+    public ResponseEntity<Map<UUID, List<OrderInfo>>> getOrdersInfo() {
+        log.info("Получение информации о товарах");
+        return ResponseEntity.ok(productService.getProductsInfo());
     }
 }

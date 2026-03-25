@@ -5,6 +5,7 @@ import com.warehouse.myshop.currency.dto.ResponseCurrencyDto;
 import com.warehouse.myshop.handler.exceptions.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
 
+    @Qualifier("currencyServiceWebClient")
     private final WebClient webClient;
     private final CurrencyServiceProperties currencyServiceProperties;
 

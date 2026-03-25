@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -17,4 +18,12 @@ public interface OrderedProductRepository extends JpaRepository<OrderedProduct, 
             "FROM OrderedProduct c " +
             "WHERE c.order.id = :order_id")
     List<ProductDto> findOrderProductsByOrderId(@Param("order_id") UUID order_id);
+
+    @Query("SELECT op FROM OrderedProduct op " +
+            "JOIN FETCH op.order AS o " +
+            "JOIN FETCH op.product AS p " +
+            "JOIN FETCH o.customer " +
+            "WHERE o.status = 'CREATED' " +
+            "OR o.status = 'CONFIRMED'")
+    Set<OrderedProduct> findFullOrderedProductsWithStatusCreatedOrConfirmed();
 }

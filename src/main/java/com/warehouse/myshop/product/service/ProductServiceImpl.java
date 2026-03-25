@@ -1,11 +1,19 @@
 package com.warehouse.myshop.product.service;
 
+import com.warehouse.myshop.account.client.AccountServiceClient;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
+import com.warehouse.myshop.crm.CrmProvider;
 import com.warehouse.myshop.currency.ExchangeRateProvider;
 import com.warehouse.myshop.currency.enums.Currency;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
+import com.warehouse.myshop.customer.dto.CustomerInfo;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
+import com.warehouse.myshop.order.dto.OrderInfo;
+import com.warehouse.myshop.order.model.Order;
+import com.warehouse.myshop.orderedproduct.model.OrderedProduct;
+import com.warehouse.myshop.orderedproduct.repository.OrderedProductRepository;
 import com.warehouse.myshop.product.dto.ListProductDto;
 import com.warehouse.myshop.product.dto.NewProductDto;
 import com.warehouse.myshop.product.dto.ResponseProductDto;
@@ -24,7 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +47,9 @@ public class ProductServiceImpl implements ProductService {
     private final CurrencyProvider currencyProvider;
     private final ProductMapper mapper;
     private final ExchangeRateProvider rateProvider;
+    private final OrderedProductRepository orderedProductRepository;
+    private final AccountServiceClient accountClient;
+    private final CrmProvider crmProvider;
 
     @Override
     @Transactional
@@ -107,6 +122,39 @@ public class ProductServiceImpl implements ProductService {
                 .builder()
                 .products(products)
                 .build();
+    }
+
+    @Override
+    public Map<UUID, List<OrderInfo>> getProductsInfo() {
+        List<OrderedProduct> findOrderedProducts = orderedProductRepository.findAll();
+        Set<String> customerLogins = findOrderedProducts.stream().map(op -> op.getOrder().getCustomer().getLogin()).collect(Collectors.toSet());
+        CompletableFuture<Map<String, String>> featureAccountNumbers = accountClient.getAccountNumbers(customerLogins);
+        CompletableFuture<Map<String, String>> featureInn = crmProvider.getInns(customerLogins);
+        return findOrderedProducts.stream().collect(Collectors.groupingBy(
+                orderedProduct -> orderedProduct.getProduct().getUuid(),
+                Collectors.mapping(
+                        orderedProduct -> {
+                            Order order = orderedProduct.getOrder();
+                            String login = order.getCustomer().getLogin();
+
+                            CustomerInfo customerInfo = new CustomerInfo(
+                                    order.getCustomer().getId(),
+                                    featureAccountNumbers.join().get(login),
+                                    order.getCustomer().getEmail(),
+                                    featureInn.join().get(login)
+                            );
+
+                            return new OrderInfo(
+                                    order.getId(),
+                                    customerInfo,
+                                    order.getStatus(),
+                                    order.getDeliveryAddress(),
+                                    orderedProduct.getQuantity()
+                            );
+                        },
+                        Collectors.toList()
+                )
+        ));
     }
 
     private static void convertPrice(ResponseProductDto responseProduct, BigDecimal currency) {
