@@ -8,6 +8,7 @@ import com.warehouse.myshop.currency.ExchangeRateProvider;
 import com.warehouse.myshop.currency.enums.Currency;
 import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.customer.dto.CustomerInfo;
+import com.warehouse.myshop.currency.session.CurrencyProvider;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import com.warehouse.myshop.order.dto.OrderInfo;
 import com.warehouse.myshop.order.model.Order;
@@ -23,7 +24,6 @@ import com.warehouse.myshop.product.model.Product;
 import com.warehouse.myshop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;

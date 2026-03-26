@@ -1,21 +1,20 @@
 package com.warehouse.myshop.category.service;
 
+import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.category.dto.ListCategoryDto;
 import com.warehouse.myshop.category.dto.NewCategoryDto;
-import com.warehouse.myshop.category.dto.CategoryDtoResp;
 import com.warehouse.myshop.category.dto.UpdateCategoryDto;
 import com.warehouse.myshop.category.mapper.CategoryMapper;
 import com.warehouse.myshop.category.model.Category;
 import com.warehouse.myshop.category.repository.CategoryRepository;
 import com.warehouse.myshop.handler.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;

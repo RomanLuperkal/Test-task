@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-shop
+  namespace: roman
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-shop
+  template:
+    metadata:
+      labels:
+        app: my-shop
+    spec:
+      containers:
+        - name: my-shop
+          image: romanluperkal/warehouse:v2
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_NAME
+              value: "my-shop"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "admin"
+            - name: DB_HOST
+              value: "my-shop-db"
+            - name: DB_PORT
+              value: "5432"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "local"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-shop
+  namespace: roman
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: my-shop

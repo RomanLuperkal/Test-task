@@ -1,11 +1,12 @@
 package com.warehouse.myshop.product.audit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+
 import java.time.LocalDateTime;
 
 @Getter

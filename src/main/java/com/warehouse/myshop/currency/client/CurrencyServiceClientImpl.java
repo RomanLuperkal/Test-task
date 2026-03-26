@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -25,10 +25,10 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
         return this.webClient.get()
                 .uri(currencyServiceProperties.getMethods().get("get-currency"))
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, clientResponse ->
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
                         Mono.error(new ResponseStatusException("Ошибка отправки get запроса в currency service со статусом: "
                                 + clientResponse.statusCode())))
-                .onStatus(HttpStatus::is5xxServerError, clientResponse ->
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
                         Mono.error(new ResponseStatusException("Ошибка отправки get запроса в currency service со статусом: "
                                 + clientResponse.statusCode())))
                 .bodyToMono(ResponseCurrencyDto.class)

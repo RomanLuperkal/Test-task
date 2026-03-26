@@ -28,6 +28,10 @@ app:
     priceIncrease: 10.1
     optimization: true
     exclusive-lock: false
+  kafka:
+    enabled: {$KAFKA_ENABLED:false}
+    bootstrapAddress: kafka:9094
+    groupId: group1
 
 rest:
   currency-service:
@@ -49,4 +53,5 @@ rest:
       post-inn: /account/inn
     mock:
       enabled: true
+
 
